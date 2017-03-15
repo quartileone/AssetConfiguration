@@ -1,0 +1,104 @@
+#ifndef ASSETCONFIGURATION_H
+#define ASSETCONFIGURATION_H
+
+
+#include "Configurations/jsonconfiguration.h"
+
+class AssetConfiguration
+        : public JsonConfiguration
+{
+public:
+    AssetConfiguration()
+        : m_id(0)
+        , m_key(QString::null)
+        , m_description(QString::null)
+    {
+    }
+
+    QString description() const { return m_description; }
+    int id() const { return m_id; }
+
+// IConfiguration implementation
+private:
+    void Serialize(ConfigSerializer& ser) override;
+    void Deserialize(ConfigSerializer& desr) override;
+
+protected:
+    int m_id;
+    QString m_key;
+    QString m_description;
+    QJsonObject m_vpn;
+};
+
+
+class AssetConfigurationList
+        : public IConfigurationList
+{
+public:
+    AssetConfigurationList()
+    {
+    }
+
+    AssetConfiguration* Item(int index) override
+    {
+        return static_cast<AssetConfiguration *>(m_list[index].data());
+    }
+
+private:
+    virtual void Serialize(ConfigSerializer& ser) override;
+    virtual void Deserialize(ConfigSerializer& desr) override;
+};
+
+
+class SiteConfiguration
+        :public JsonConfiguration
+{
+public:
+    SiteConfiguration()
+        : m_description(QString::null)
+        , m_timeZone(QString::null)
+    {
+    }
+
+    AssetConfigurationList& Assets() { return m_assets; }
+
+    QString description() const { return m_description; }
+    QString timeZone() const { return m_timeZone; }
+    QJsonObject cluster() const { return m_cluster; }
+    QJsonObject deviceHub() const { return m_deviceHub; }
+
+private:
+    virtual void Serialize(ConfigSerializer& ser) override;
+    virtual void Deserialize(ConfigSerializer& desr) override;
+
+protected:
+    QString m_description;
+    QString m_timeZone;
+    QJsonObject m_cluster;
+    QJsonObject m_deviceHub;
+    AssetConfigurationList m_assets;
+};
+
+
+class SiteConfigurationList
+        : public IConfigurationList
+{
+public:
+    SiteConfigurationList()
+    {
+    }
+
+    SiteConfiguration* Item(int index) override
+    {
+        return static_cast<SiteConfiguration *>(m_list[index].data());
+    }
+
+private:
+    virtual void Serialize(ConfigSerializer& ser) override;
+    virtual void Deserialize(ConfigSerializer& desr) override;
+
+};
+
+
+
+#endif // ASSETCONFIGURATION_H

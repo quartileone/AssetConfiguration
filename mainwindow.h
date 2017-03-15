@@ -1,0 +1,64 @@
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+#include <QDir>
+
+#include <qdevicewatcher.h>
+
+#include "configurationmanager.h"
+#include "mineqtabmanager.h"
+
+#include "DataModel/iconfiguration.h"
+
+#include "MineqWidgets/assetconfigprocesswidget.h"
+#include "MineqWidgets/mineqmessagewidget.h"
+
+namespace Ui {
+class MainWindow;
+}
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit MainWindow(QWidget *parent = 0);
+    ~MainWindow();
+
+    bool Initialize();
+
+    void Start();
+
+private:
+    void ShowManualConfiguration(QDir moundetConfigDir);
+
+    void ShowDefaultView();
+
+    void ReconfigurAsset(QString mountPath);
+
+
+private slots:
+    void on_OkButton_clicked();
+
+    void on_cancelButton_clicked();
+
+    void on_table_cell_clicked(int row, int col);
+
+    void slot_device_added(const QString& dev);
+
+    void slot_device_removed(const QString& dev);
+
+    void slot_configuration_finished(IConfiguration* configuration, ConfigurationType configType);
+
+    void slot_on_mineq_msg_button_clicked(QString val, MineqButton but);
+
+private:
+    Ui::MainWindow          *ui;
+    QDeviceWatcher          *m_usbWatcher;
+    ConfigurationManager    *m_configManager;
+    MineqTabManager         *m_tabManager;
+    bool m_rebootOnUsbDetach;
+};
+
+#endif // MAINWINDOW_H
