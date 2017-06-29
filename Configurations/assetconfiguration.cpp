@@ -9,7 +9,8 @@ void AssetConfiguration::Serialize(ConfigSerializer &ser)
     ser.Serialize("id",             m_id)
        .Serialize("key",            m_key)
        .Serialize("description",    m_description)
-       .Serialize("vpn",            m_vpn);
+       .Serialize("vpn",            m_vpn)
+       .Serialize("lan",            m_lan);
 }
 
 void AssetConfiguration::Deserialize(ConfigSerializer &desr)
@@ -17,7 +18,8 @@ void AssetConfiguration::Deserialize(ConfigSerializer &desr)
     desr.Deserialize("id",          m_id)
         .Deserialize("key",         m_key)
         .Deserialize("description", m_description)
-        .Deserialize("vpn",         m_vpn);
+        .Deserialize("vpn",         m_vpn)
+        .Deserialize("lan",         m_lan);
 }
 
 void AssetConfigurationList::Serialize(ConfigSerializer &/*ser*/)

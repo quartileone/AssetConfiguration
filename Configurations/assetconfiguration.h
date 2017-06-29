@@ -28,6 +28,7 @@ protected:
     QString m_key;
     QString m_description;
     QJsonObject m_vpn;
+    QJsonObject m_lan;
 };
 
 
