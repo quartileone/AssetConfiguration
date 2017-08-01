@@ -71,19 +71,19 @@ AssetConfigProcessWidget::~AssetConfigProcessWidget()
     delete this->layout();
 }
 
-void AssetConfigProcessWidget::StartConfiguration(IConfiguration *assetConfiguration)
+void AssetConfigProcessWidget::StartConfiguration(QString & usbMountedPath, IConfiguration *assetConfiguration)
 {
     m_progress->start();
     if (assetConfiguration) {
         m_configurationType = ConfigurationType::Manual;
-        ApplyConfiguration(assetConfiguration);
+        ApplyConfiguration(usbMountedPath, assetConfiguration);
     } else {
         m_configurationType = ConfigurationType::Manual;
         DownloadCondifuration();
     }
 }
 
-void AssetConfigProcessWidget::ApplyConfiguration(IConfiguration *assetConfiguration)
+void AssetConfigProcessWidget::ApplyConfiguration(QString & usbMountedPath, IConfiguration *assetConfiguration)
 {
     m_assetConfiguration = QSharedPointer<IConfiguration>(assetConfiguration);
 
@@ -93,7 +93,7 @@ void AssetConfigProcessWidget::ApplyConfiguration(IConfiguration *assetConfigura
     ConfigSerializer::SerializeS(*assetConfiguration, data);
 
     m_configProcess->start(shFile, QStringList()
-                << data);
+                << data << usbMountedPath);
 }
 
 void AssetConfigProcessWidget::DownloadCondifuration()
@@ -121,7 +121,8 @@ void AssetConfigProcessWidget::slot_config_downloaded(QNetworkReply *reply)
         assetConfig.InsertConfiguration("", siteConfigList.Item(0));
         assetConfig.InsertConfiguration("", siteConfigList.Item(0)->Assets().Item(0));
 
-        ApplyConfiguration(&assetConfig);
+        QString str;
+        ApplyConfiguration(str, &assetConfig);
     } else {
         emit configFinished(NULL, m_configurationType);
     }

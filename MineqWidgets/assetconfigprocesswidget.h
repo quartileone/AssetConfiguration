@@ -27,10 +27,10 @@ public:
     explicit AssetConfigProcessWidget(JsonConfiguration* configuration, QWidget *parent = 0);
     ~AssetConfigProcessWidget();
 
-    void StartConfiguration(IConfiguration* assetConfiguration = NULL);
+    void StartConfiguration(QString & usbMountedPath, IConfiguration* assetConfiguration = NULL);
 
 private:
-    void ApplyConfiguration(IConfiguration* assetConfiguration);
+    void ApplyConfiguration(QString & usbMountedPath, IConfiguration* assetConfiguration);
 
     void DownloadCondifuration();
 

@@ -1,6 +1,7 @@
 
 #include <QFile>
 #include <QDir>
+#include <QTextCodec>
 
 #include "configurationmanager.h"
 
@@ -128,12 +129,15 @@ bool ConfigurationManager::SaveConfiguration(IConfiguration& configuration, QStr
 QString ConfigurationManager::ReadJsonConfig(QString strJsonFile)
 {
     QString fileContent;
-    QFile jsonFile(strJsonFile);
+    QFile jsonFile( QFile::decodeName(strJsonFile.toLatin1()) );
     if (jsonFile.open(QIODevice::ReadOnly | QIODevice::Text) == false) {
         return QString::null;
     }
 
-    fileContent = jsonFile.readAll();
+    QTextStream out(&jsonFile);
+    QTextCodec * codec = QTextCodec::codecForName("UTF-8");
+    fileContent = codec->toUnicode(out.readAll().toLatin1());
+
     jsonFile.close();
 
     return fileContent;

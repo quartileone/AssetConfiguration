@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QDir>
+#include <QString>
 
 #include <qdevicewatcher.h>
 
@@ -59,6 +60,7 @@ private:
     ConfigurationManager    *m_configManager;
     MineqTabManager         *m_tabManager;
     bool m_rebootOnUsbDetach;
+    QString m_mountedPath;
 };
 
 #endif // MAINWINDOW_H

@@ -200,7 +200,7 @@ void MainWindow::on_OkButton_clicked()
     m_tabManager->SetTabCount(1);
     m_tabManager->AddMineqWidget(configProcWidget, "Configuring");
 
-    configProcWidget->StartConfiguration(assetConfiguration);
+    configProcWidget->StartConfiguration(m_mountedPath, assetConfiguration);
 }
 
 void MainWindow::on_cancelButton_clicked()
@@ -234,6 +234,8 @@ void MainWindow::slot_device_added(const QString &dev)
     if (configMounter->IsConfigUsbFlash()) {
         m_tabManager->ClearTabs();
         TerminalCmdExecutor::UnlockScreen(m_configManager->userPassword());
+
+        m_mountedPath = configMounter->usbMountedDir().absolutePath();
 
         if (m_configManager->IsAssetConfigured()) {
             ReconfigurAsset(configMounter->usbMountedDir().absolutePath());
