@@ -40,7 +40,8 @@ void SiteConfiguration::Serialize(ConfigSerializer &ser)
     ser.Serialize("description",    m_description)
        .Serialize("cluster",        m_cluster)
        .Serialize("deviceHub",      m_deviceHub)
-       .Serialize("timeZone",       m_timeZone);
+       .Serialize("timeZone",       m_timeZone)
+       .Serialize("ntpServer",      m_ntpServer);
 }
 
 void SiteConfiguration::Deserialize(ConfigSerializer &desr)
@@ -49,7 +50,8 @@ void SiteConfiguration::Deserialize(ConfigSerializer &desr)
         .Deserialize("cluster",         m_cluster)
         .Deserialize("deviceHub",       m_deviceHub)
         .Deserialize("assetConfigs",    m_assets)
-        .Deserialize("timeZone",        m_timeZone);
+        .Deserialize("timeZone",        m_timeZone)
+        .Deserialize("ntpServer",       m_ntpServer);
 }
 
 

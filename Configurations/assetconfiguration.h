@@ -75,6 +75,7 @@ private:
 protected:
     QString m_description;
     QString m_timeZone;
+    QJsonValue m_ntpServer;
     QJsonObject m_cluster;
     QJsonObject m_deviceHub;
     AssetConfigurationList m_assets;
