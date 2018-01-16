@@ -13,7 +13,7 @@ ConfigSerializer &ConfigSerializer::Serialize(const QString &key, IConfiguration
     value->Serialize(ser);
 
     QJsonValue json_val = QJsonValue(ser.root());
-    if(!json_val.isNull()) {
+    if(!json_val.isNull() && !json_val.isUndefined()) {
         m_root.insert(key, json_val);
     }
 
