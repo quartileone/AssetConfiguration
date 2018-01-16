@@ -79,6 +79,7 @@ protected:
     QJsonObject m_cluster;
     QJsonObject m_deviceHub;
     AssetConfigurationList m_assets;
+    QString m_uri;
 };
 
 

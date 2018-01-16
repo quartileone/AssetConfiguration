@@ -20,7 +20,7 @@ public:
     ConfigSerializer& Serialize(const QString& key, V& value)
     {
         QJsonValue jsonValue(value);
-        if( !jsonValue.isUndefined()) {
+        if( !jsonValue.isUndefined() && !jsonValue.isNull()) {
             m_root.insert(key, jsonValue);
         }
 

@@ -5,7 +5,7 @@
 #include "Configurations/assetconfiguration.h"
 
 #include "assetconfigprocesswidget.h"
-
+#include <iostream>
 
 AssetConfigProcessWidget::AssetConfigProcessWidget(JsonConfiguration* configuration, QWidget *parent)
     : QWidget(parent)
@@ -90,9 +90,10 @@ void AssetConfigProcessWidget::ApplyConfiguration(QString & usbMountedPath, ICon
     QString shFile;
     m_configuration->TakeValue("shFile", shFile);
     QString data;
+
     ConfigSerializer::SerializeS(*assetConfiguration, data);
 
-    m_configProcess->start(shFile, QStringList()
+     m_configProcess->start(shFile, QStringList()
                 << data << usbMountedPath);
 }
 
