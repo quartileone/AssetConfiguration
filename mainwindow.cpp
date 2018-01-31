@@ -18,8 +18,6 @@
 
 
 #define START_CONFIG_FILE_NAME "StartDeviceConfiguration.sh"
-#define CONFIG_FILE_NAME "Config.json"
-
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -107,7 +105,7 @@ void MainWindow::Start()
 
 void MainWindow::ShowManualConfiguration(QDir moundetConfigDir)
 {
-    QString configFile = moundetConfigDir.absoluteFilePath(CONFIG_FILE_NAME);
+    QString configFile = moundetConfigDir.absoluteFilePath(USB_CONFIG_FILE_NAME);
     SiteConfigurationList* configList = m_configManager->GetAvailableConfiguration(configFile);
     if (!configList) {
         m_tabManager->SetTabCount(1);
@@ -177,8 +175,8 @@ void MainWindow::on_OkButton_clicked()
     ui->OkButton->setVisible(false);
     ui->cancelButton->setVisible(false);
 
-    AssetTableWidget* assetTable = static_cast<AssetTableWidget*>(ui->tabWidget->currentWidget());
-    AssetTableWidgetItem* tableItem = static_cast<AssetTableWidgetItem*>(assetTable->item(assetTable->currentRow(), assetTable->currentColumn()));
+    AssetTableWidget* assetTable = dynamic_cast<AssetTableWidget*>(ui->tabWidget->currentWidget());
+    AssetTableWidgetItem* tableItem = dynamic_cast<AssetTableWidgetItem*>(assetTable->item(assetTable->currentRow(), assetTable->currentColumn()));
 
     JsonConfiguration* pocessConfig = new JsonConfiguration();
     pocessConfig->InsertValue("shFile", m_configManager->workingPath() + QDir::separator() + START_CONFIG_FILE_NAME);
@@ -192,6 +190,7 @@ void MainWindow::on_OkButton_clicked()
             , SLOT(slot_configuration_finished(IConfiguration*, ConfigurationType)));
 
     JsonConfiguration* assetConfiguration = new JsonConfiguration();
+
     assetConfiguration->InsertConfiguration("", assetTable->configuration());
     assetConfiguration->InsertConfiguration("assetConfigs", tableItem->configuration());
 

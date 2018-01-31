@@ -12,6 +12,8 @@
 #include <QString>
 #include <QDir>
 
+#define USB_CONFIG_FILE_NAME "Config.json"
+
 class UsbConfigMounter
 {
 public:

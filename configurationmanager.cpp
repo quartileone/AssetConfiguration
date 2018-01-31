@@ -2,6 +2,7 @@
 #include <QFile>
 #include <QDir>
 #include <QTextCodec>
+#include <QJsonDocument>
 
 #include "configurationmanager.h"
 
@@ -23,6 +24,8 @@ bool ConfigurationManager::Initialize()
     QString configData;
     configData = localConfigFile.readAll();
     localConfigFile.close();
+
+    std::string fn = LOCAL_CONFIG_FILE;
 
     ConfigSerializer::DeserializeS(*m_configuration, configData);
 
@@ -57,10 +60,16 @@ SiteConfigurationList* ConfigurationManager::GetAvailableConfiguration(QString c
 void ConfigurationManager::UserDone(IConfiguration* configuration)
 {
     DeviceConfiguration deviceConfig;
-    ConfigSerializer::DeserializeC(deviceConfig, *configuration);
+    // firstly deserialize local config
     ConfigSerializer::DeserializeC(deviceConfig, *m_configuration);
+    // now take some overrides from asset config:
+    ConfigSerializer::DeserializeC(deviceConfig, *configuration);
+
     Directories dirs = m_configuration->directories();
-    SaveConfiguration(deviceConfig, dirs.rootDir() + dirs.deviceDir() + QDir::separator() + DEVICE_CONFIG_FILE_NAME);
+    QString path = dirs.rootDir() + dirs.deviceDir() + QDir::separator() + DEVICE_CONFIG_FILE_NAME;
+
+    if (!SaveConfiguration(deviceConfig, path))
+        qDebug() << "cannot save config " << path;
 
     JsonConfiguration siteConfig;
     siteConfig.InsertConfiguration("", configuration);

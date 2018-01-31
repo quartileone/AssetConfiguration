@@ -18,7 +18,7 @@ public:
 
     void Initialize(SiteConfiguration* configuration);
 
-    JsonConfiguration* configuration() { return static_cast<JsonConfiguration *>(m_configuration); }
+    JsonConfiguration* configuration() { return dynamic_cast<JsonConfiguration *>(m_configuration); }
 
 private:
     void InitStyleShit();
@@ -43,7 +43,7 @@ public:
         delete m_configuration;
     }
 
-    AssetConfiguration* configuration() { return static_cast<AssetConfiguration *>(m_configuration); }
+    AssetConfiguration* configuration() { return dynamic_cast<AssetConfiguration *>(m_configuration); }
 
 private:
     IConfiguration* m_configuration;

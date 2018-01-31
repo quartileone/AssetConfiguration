@@ -89,8 +89,8 @@ void AssetConfigProcessWidget::ApplyConfiguration(QString & usbMountedPath, ICon
 
     QString shFile;
     m_configuration->TakeValue("shFile", shFile);
-    QString data;
 
+    QString data;
     ConfigSerializer::SerializeS(*assetConfiguration, data);
 
      m_configProcess->start(shFile, QStringList()

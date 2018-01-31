@@ -8,8 +8,7 @@
 #include "mineqmessagewidget.h"
 
 MineqMessageWidget::MineqMessageWidget(QString workingDir, QWidget *parent)
-    : m_workingDir(workingDir)
-    , QWidget(parent)
+    : QWidget(parent), m_workingDir(workingDir)
 {
 
 }

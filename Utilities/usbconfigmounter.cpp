@@ -72,7 +72,7 @@ bool UsbConfigMounter::IsConfigUsbFlash()
     }
 
     QStringList filters;
-    filters << "Config.json";
+    filters << USB_CONFIG_FILE_NAME;
     m_usbMountedDir.setNameFilters(filters);
 
     return m_usbMountedDir.entryList(QDir::Files).size() > 0;
