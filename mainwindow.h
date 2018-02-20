@@ -44,7 +44,7 @@ private slots:
 
     void on_cancelButton_clicked();
 
-    void on_table_cell_clicked(int row, int col);
+    void slot_on_table_cell_clicked(int row, int col);
 
     void slot_device_added(const QString& dev);
 

@@ -26,12 +26,12 @@ AssetTableWidget::~AssetTableWidget()
 
 void AssetTableWidget::Initialize(SiteConfiguration* configuration)
 {
-    /*
-     * connect(this
+     /*
+      * connect(this
             , SIGNAL(cellClicked(int, int))
             , this
             , SLOT(on_table_cell_clicked(int,int)));
-*/
+    */
     JsonConfiguration* assetConfig = new JsonConfiguration();
     assetConfig->InsertConfiguration("", configuration);
 

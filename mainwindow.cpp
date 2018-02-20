@@ -126,7 +126,7 @@ void MainWindow::ShowManualConfiguration(QDir moundetConfigDir)
         connect(assetTable
                 , SIGNAL(cellClicked(int, int))
                 , this
-                , SLOT(on_table_cell_clicked(int,int)));
+                , SLOT(slot_on_table_cell_clicked(int,int)));
 
         m_tabManager->AddMineqWidget(assetTable, configList->Item(i)->description());
         ++iRow;
@@ -213,7 +213,7 @@ void MainWindow::on_cancelButton_clicked()
     ShowDefaultView();
 }
 
-void MainWindow::on_table_cell_clicked(int /*row*/, int /*col*/)
+void MainWindow::slot_on_table_cell_clicked(int /*row*/, int /*col*/)
 {
     QPushButton *but = ui->centralWidget->findChild<QPushButton*>("OkButton");
 
