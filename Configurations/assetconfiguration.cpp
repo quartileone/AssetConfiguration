@@ -42,6 +42,7 @@ void SiteConfiguration::Serialize(ConfigSerializer &ser)
        .Serialize("deviceHub",      m_deviceHub)
        .Serialize("timeZone",       m_timeZone)
        .Serialize("ntpServer",      m_ntpServer)
+       .Serialize("oauth",          m_oauth)
        .Serialize("uri",            m_uri);
 }
 
@@ -53,6 +54,7 @@ void SiteConfiguration::Deserialize(ConfigSerializer &desr)
         .Deserialize("assetConfigs",    m_assets)
         .Deserialize("timeZone",        m_timeZone)
         .Deserialize("ntpServer",       m_ntpServer)
+        .Deserialize("oauth",           m_oauth)
         .Deserialize("uri",             m_uri);
 }
 

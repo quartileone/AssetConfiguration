@@ -79,7 +79,8 @@ protected:
     QJsonObject m_cluster;
     QJsonObject m_deviceHub;
     AssetConfigurationList m_assets;
-    QString m_uri;
+    QString m_uri;   // uri to config api
+    QString m_oauth; // uri to oauth for config api
 };
 
 
