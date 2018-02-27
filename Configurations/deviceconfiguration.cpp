@@ -11,6 +11,7 @@ void DeviceConfiguration::Serialize(ConfigSerializer &ser)
         .Serialize("cluster",         m_cluster)
         .Serialize("urn",             m_urn)
         .Serialize("openvpnserver",   m_openvpnServer)
+        .Serialize("oauth",           m_oauth)
         .Serialize("uri",             m_uri);
 }
 
@@ -22,5 +23,7 @@ void DeviceConfiguration::Deserialize(ConfigSerializer &desr)
         .Deserialize("cluster",         m_cluster)
         .Deserialize("urn",             m_urn)
         .Deserialize("openvpnserver",   m_openvpnServer)
+        .Deserialize("oauth",           m_oauth)
         .Deserialize("uri",             m_uri);
+
 }

@@ -58,6 +58,8 @@ public:
     SiteConfiguration()
         : m_description(QString::null)
         , m_timeZone(QString::null)
+        , m_uri(QString::null)
+        , m_oauth(QString::null)
     {
     }
 

@@ -11,6 +11,7 @@ public:
         : m_id(0)
         , m_serialNumber(QString::null)
         , m_uri(QString::null)
+        , m_oauth(QString::null)
     {
     }
 
@@ -25,8 +26,9 @@ private:
     QJsonObject m_deviceHub;
     QJsonObject m_cluster;
     QJsonObject m_urn;
-    QJsonValue m_openvpnServer;
-    QString m_uri;
+    QJsonValue  m_openvpnServer;
+    QString     m_uri;
+    QString     m_oauth;
 
 };
 
