@@ -32,7 +32,7 @@ public:
 private:
     void ApplyConfiguration(QString & usbMountedPath, IConfiguration* assetConfiguration);
 
-    void DownloadCondifuration();
+    void DownloadConfiguration();
 
 signals:
     void configFinished(IConfiguration* configuration, ConfigurationType configType);

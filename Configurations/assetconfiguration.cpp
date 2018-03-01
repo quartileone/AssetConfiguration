@@ -43,7 +43,8 @@ void SiteConfiguration::Serialize(ConfigSerializer &ser)
        .Serialize("timeZone",       m_timeZone)
        .Serialize("ntpServer",      m_ntpServer)
        .Serialize("oauth",          m_oauth)
-       .Serialize("uri",            m_uri);
+       .Serialize("uri",            m_uri)
+       .Serialize("qos",            m_qos);
 }
 
 void SiteConfiguration::Deserialize(ConfigSerializer &desr)
@@ -55,7 +56,8 @@ void SiteConfiguration::Deserialize(ConfigSerializer &desr)
         .Deserialize("timeZone",        m_timeZone)
         .Deserialize("ntpServer",       m_ntpServer)
         .Deserialize("oauth",           m_oauth)
-        .Deserialize("uri",             m_uri);
+        .Deserialize("uri",             m_uri)
+        .Deserialize("qos",             m_qos);
 }
 
 

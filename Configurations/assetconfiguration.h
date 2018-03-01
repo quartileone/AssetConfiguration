@@ -60,6 +60,7 @@ public:
         , m_timeZone(QString::null)
         , m_uri(QString::null)
         , m_oauth(QString::null)
+        , m_qos(QString::null)
     {
     }
 
@@ -83,6 +84,7 @@ protected:
     AssetConfigurationList m_assets;
     QString m_uri;   // uri to config api
     QString m_oauth; // uri to oauth for config api
+    QString m_qos; // qos for devices
 };
 
 

@@ -6,6 +6,11 @@
 
 #include "assetconfigprocesswidget.h"
 #include <iostream>
+#include <QFile>
+#include <QDir>
+
+#define QOS_DIR  "/mineq/devices/qos"
+#define QOS_FILE QOS_DIR "/USER_QOS_PROFILES.xml"
 
 AssetConfigProcessWidget::AssetConfigProcessWidget(JsonConfiguration* configuration, QWidget *parent)
     : QWidget(parent)
@@ -79,13 +84,35 @@ void AssetConfigProcessWidget::StartConfiguration(QString & usbMountedPath, ICon
         ApplyConfiguration(usbMountedPath, assetConfiguration);
     } else {
         m_configurationType = ConfigurationType::Manual;
-        DownloadCondifuration();
+        DownloadConfiguration();
     }
 }
 
 void AssetConfigProcessWidget::ApplyConfiguration(QString & usbMountedPath, IConfiguration *assetConfiguration)
 {
     m_assetConfiguration = QSharedPointer<IConfiguration>(assetConfiguration);
+
+    QString strQOS;
+    m_configuration->TakeValue("qos", strQOS);
+
+    QDir dir(QOS_DIR);
+    if (!dir.exists()) {
+        dir.mkpath(".");
+    }
+
+    QFile qosFile(QOS_FILE);
+
+    if(qosFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    {
+        qosFile.setPermissions(QFileDevice::ReadUser | QFileDevice::WriteUser |
+                               QFileDevice::ReadGroup | QFileDevice::WriteGroup |
+                               QFileDevice::ReadOther | QFileDevice::WriteOther );
+        qosFile.write(strQOS.toLatin1().data());
+        qosFile.close();
+    }
+
+
+    qDebug() << strQOS;
 
     QString shFile;
     m_configuration->TakeValue("shFile", shFile);
@@ -97,7 +124,7 @@ void AssetConfigProcessWidget::ApplyConfiguration(QString & usbMountedPath, ICon
                 << data << usbMountedPath);
 }
 
-void AssetConfigProcessWidget::DownloadCondifuration()
+void AssetConfigProcessWidget::DownloadConfiguration()
 {
     m_logsLabel->setText("Downloading configuration...");
     QNetworkAccessManager* networkManager = new QNetworkAccessManager();
