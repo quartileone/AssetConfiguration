@@ -9,7 +9,7 @@
 #include <QFile>
 #include <QDir>
 
-#define QOS_DIR  "/mineq/devices/qos"
+#define QOS_DIR  "/mineq/device/qos"
 #define QOS_FILE QOS_DIR "/USER_QOS_PROFILES.xml"
 
 AssetConfigProcessWidget::AssetConfigProcessWidget(JsonConfiguration* configuration, QWidget *parent)
@@ -93,7 +93,10 @@ void AssetConfigProcessWidget::ApplyConfiguration(QString & usbMountedPath, ICon
     m_assetConfiguration = QSharedPointer<IConfiguration>(assetConfiguration);
 
     QString strQOS;
-    m_configuration->TakeValue("qos", strQOS);
+
+    JsonConfiguration *cfg;
+    cfg = dynamic_cast<JsonConfiguration *>(assetConfiguration);
+    cfg->TakeValue("qos", strQOS);
 
     QDir dir(QOS_DIR);
     if (!dir.exists()) {
