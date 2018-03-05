@@ -88,15 +88,21 @@ void AssetConfigProcessWidget::StartConfiguration(QString & usbMountedPath, ICon
     }
 }
 
-void AssetConfigProcessWidget::ApplyConfiguration(QString & usbMountedPath, IConfiguration *assetConfiguration)
+void AssetConfigProcessWidget::ApplyQOS(JsonConfiguration *cfg)
 {
-    m_assetConfiguration = QSharedPointer<IConfiguration>(assetConfiguration);
+    QString strQTQOS;
+    cfg->TakeValue("qos", strQTQOS);
 
-    QString strQOS;
+    std::string strQOS(strQTQOS.toLatin1().data());
 
-    JsonConfiguration *cfg;
-    cfg = dynamic_cast<JsonConfiguration *>(assetConfiguration);
-    cfg->TakeValue("qos", strQOS);
+    size_t pos;
+
+    std::string strToFind("\\r\\n");
+
+    while ((pos = strQOS.find(strToFind)) != std::string::npos) {
+        auto it = strQOS.begin() + pos;
+        strQOS.replace(it, it + strToFind.length(), "\r\n");
+    }
 
     QDir dir(QOS_DIR);
     if (!dir.exists()) {
@@ -110,12 +116,19 @@ void AssetConfigProcessWidget::ApplyConfiguration(QString & usbMountedPath, ICon
         qosFile.setPermissions(QFileDevice::ReadUser | QFileDevice::WriteUser |
                                QFileDevice::ReadGroup | QFileDevice::WriteGroup |
                                QFileDevice::ReadOther | QFileDevice::WriteOther );
-        qosFile.write(strQOS.toLatin1().data());
+        qosFile.write(strQOS.c_str());
         qosFile.close();
     }
 
 
-    qDebug() << strQOS;
+}
+
+void AssetConfigProcessWidget::ApplyConfiguration(QString & usbMountedPath, IConfiguration *assetConfiguration)
+{
+    m_assetConfiguration = QSharedPointer<IConfiguration>(assetConfiguration);
+
+    JsonConfiguration *cfg = dynamic_cast<JsonConfiguration *>(assetConfiguration);
+    ApplyQOS(cfg);
 
     QString shFile;
     m_configuration->TakeValue("shFile", shFile);
