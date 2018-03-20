@@ -1,6 +1,7 @@
 
 #include <QJsonDocument>
 #include <QJsonArray>
+#include <QDebug>
 
 #include "configserializer.h"
 
@@ -96,7 +97,14 @@ void ConfigSerializer::DeserializeS(IConfiguration &out, QString &in)
 {
     ConfigSerializer deserializer;
 
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(in.toUtf8());
+    QJsonParseError err;
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(in.toUtf8(), &err);
+
+    if (jsonDoc.isNull())
+    {
+        qDebug() << err.errorString();
+        throw err;
+    }
 
     deserializer.setRoot(jsonDoc.object());
 

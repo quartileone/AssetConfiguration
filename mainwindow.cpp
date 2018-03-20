@@ -1,5 +1,4 @@
 #include <QFile>
-#include <QDebug>
 #include <QDir>
 #include <QTableWidget>
 
