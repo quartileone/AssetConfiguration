@@ -42,7 +42,7 @@ ConfigSerializer &ConfigSerializer::Deserialize(const QString &key, int &value)
 ConfigSerializer &ConfigSerializer::Deserialize(const QString &key, QJsonObject& value)
 {
     QJsonValue jsonVal = m_root.value(key);
-    if (!jsonVal.isUndefined()) {
+    if (jsonVal.type() == QJsonValue::Object) {
         value = jsonVal.toObject();
     }
 
