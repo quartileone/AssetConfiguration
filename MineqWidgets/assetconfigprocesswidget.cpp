@@ -10,7 +10,8 @@
 #include <QDir>
 
 #define QOS_DIR  "/mineq/device/qos"
-#define QOS_FILE QOS_DIR "/USER_QOS_PROFILES.xml"
+#define DEVICE_QOS_FILE QOS_DIR "/USER_QOS_PROFILES.xml"
+#define PERS_QOS_FILE QOS_DIR "/Persistence.xml"
 
 AssetConfigProcessWidget::AssetConfigProcessWidget(JsonConfiguration* configuration, QWidget *parent)
     : QWidget(parent)
@@ -88,10 +89,9 @@ void AssetConfigProcessWidget::StartConfiguration(QString & usbMountedPath, ICon
     }
 }
 
-void AssetConfigProcessWidget::ApplyQOS(JsonConfiguration *cfg)
-{
+void AssetConfigProcessWidget::ApplyOneQOS(JsonConfiguration *cfg, const QString &strNodeName, QString strFileName) {
     QString strQTQOS;
-    cfg->TakeValue("qos", strQTQOS);
+    cfg->TakeValue(strNodeName, strQTQOS);
 
     std::string strQOS(strQTQOS.toLatin1().data());
 
@@ -104,12 +104,7 @@ void AssetConfigProcessWidget::ApplyQOS(JsonConfiguration *cfg)
         strQOS.replace(it, it + strToFind.length(), "\r\n");
     }
 
-    QDir dir(QOS_DIR);
-    if (!dir.exists()) {
-        dir.mkpath(".");
-    }
-
-    QFile qosFile(QOS_FILE);
+    QFile qosFile(strFileName);
 
     if(qosFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
     {
@@ -119,8 +114,24 @@ void AssetConfigProcessWidget::ApplyQOS(JsonConfiguration *cfg)
         qosFile.write(strQOS.c_str());
         qosFile.close();
     }
+}
 
+void AssetConfigProcessWidget::ApplyQOSs(JsonConfiguration *cfg)
+{
+    QDir dir(QOS_DIR);
+    if (dir.exists()) {
+        // sometimes folder might be created by docker and in this case it is rooted!
+        // see also https://stackoverflow.com/questions/39794793/docker-volume-option-create-folder-as-root-user
+        QProcess* proc = new QProcess();
+        proc->start(QString("sudo chmod a+rwx ") + QString(QOS_DIR));
+        proc->waitForFinished();
+        proc->close();
+    } else {
+        dir.mkpath(".");
+    }
 
+    ApplyOneQOS(cfg, "qos", DEVICE_QOS_FILE);
+    ApplyOneQOS(cfg, "persistence_qos_profile", PERS_QOS_FILE);
 }
 
 void AssetConfigProcessWidget::ApplyConfiguration(QString & usbMountedPath, IConfiguration *assetConfiguration)
@@ -128,7 +139,7 @@ void AssetConfigProcessWidget::ApplyConfiguration(QString & usbMountedPath, ICon
     m_assetConfiguration = QSharedPointer<IConfiguration>(assetConfiguration);
 
     JsonConfiguration *cfg = dynamic_cast<JsonConfiguration *>(assetConfiguration);
-    ApplyQOS(cfg);
+    ApplyQOSs(cfg);
 
     QString shFile;
     m_configuration->TakeValue("shFile", shFile);
@@ -136,8 +147,7 @@ void AssetConfigProcessWidget::ApplyConfiguration(QString & usbMountedPath, ICon
     QString data;
     ConfigSerializer::SerializeS(*assetConfiguration, data);
 
-     m_configProcess->start(shFile, QStringList()
-                << data << usbMountedPath);
+    m_configProcess->start(shFile, QStringList() << data << usbMountedPath);
 }
 
 void AssetConfigProcessWidget::DownloadConfiguration()

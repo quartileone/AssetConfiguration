@@ -30,7 +30,8 @@ public:
     void StartConfiguration(QString & usbMountedPath, IConfiguration* assetConfiguration = NULL);
 
 private:
-    void ApplyQOS(JsonConfiguration *cfg);
+    void ApplyQOSs(JsonConfiguration *cfg);
+    void ApplyOneQOS(JsonConfiguration *cfg, const QString &strNodeName, QString strFileName);
     void ApplyConfiguration(QString & usbMountedPath, IConfiguration* assetConfiguration);
 
     void DownloadConfiguration();
