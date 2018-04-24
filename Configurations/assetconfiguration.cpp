@@ -37,14 +37,15 @@ void AssetConfigurationList::Deserialize(ConfigSerializer &desr)
 
 void SiteConfiguration::Serialize(ConfigSerializer &ser)
 {
-    ser.Serialize("description",    m_description)
-       .Serialize("cluster",        m_cluster)
-       .Serialize("deviceHub",      m_deviceHub)
-       .Serialize("timeZone",       m_timeZone)
-       .Serialize("ntpServer",      m_ntpServer)
-       .Serialize("oauth",          m_oauth)
-       .Serialize("uri",            m_uri)
-       .Serialize("qos",            m_qos);
+    ser.Serialize("description",     m_description)
+       .Serialize("cluster",         m_cluster)
+       .Serialize("deviceHub",       m_deviceHub)
+       .Serialize("timeZone",        m_timeZone)
+       .Serialize("ntpServer",       m_ntpServer)
+       .Serialize("oauth",           m_oauth)
+       .Serialize("uri",             m_uri)
+       .Serialize("qos",             m_qos)
+       .Serialize("persistence_qos", m_persistence_qos);
 }
 
 void SiteConfiguration::Deserialize(ConfigSerializer &desr)
@@ -57,7 +58,8 @@ void SiteConfiguration::Deserialize(ConfigSerializer &desr)
         .Deserialize("ntpServer",       m_ntpServer)
         .Deserialize("oauth",           m_oauth)
         .Deserialize("uri",             m_uri)
-        .Deserialize("qos",             m_qos);
+        .Deserialize("qos",             m_qos)
+        .Deserialize("persistence_qos", m_persistence_qos);
 }
 
 

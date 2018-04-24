@@ -61,6 +61,7 @@ public:
         , m_uri(QString::null)
         , m_oauth(QString::null)
         , m_qos(QString::null)
+        , m_persistence_qos(QString::null)
     {
     }
 
@@ -85,6 +86,7 @@ protected:
     QString m_uri;   // uri to config api
     QString m_oauth; // uri to oauth for config api
     QString m_qos; // qos for devices
+    QString m_persistence_qos; // qos for persistence
 };
 
 

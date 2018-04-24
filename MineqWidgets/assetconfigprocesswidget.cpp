@@ -131,7 +131,7 @@ void AssetConfigProcessWidget::ApplyQOSs(JsonConfiguration *cfg)
     }
 
     ApplyOneQOS(cfg, "qos", DEVICE_QOS_FILE);
-    ApplyOneQOS(cfg, "persistence_qos_profile", PERS_QOS_FILE);
+    ApplyOneQOS(cfg, "persistence_qos", PERS_QOS_FILE);
 }
 
 void AssetConfigProcessWidget::ApplyConfiguration(QString & usbMountedPath, IConfiguration *assetConfiguration)
