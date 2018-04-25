@@ -6,20 +6,22 @@
 
 void AssetConfiguration::Serialize(ConfigSerializer &ser)
 {
-    ser.Serialize("id",             m_id)
-       .Serialize("key",            m_key)
-       .Serialize("description",    m_description)
-       .Serialize("vpn",            m_vpn)
-       .Serialize("lan",            m_lan);
+    ser.Serialize("id",                      m_id)
+       .Serialize("key",                     m_key)
+       .Serialize("description",             m_description)
+       .Serialize("vpn",                     m_vpn)
+       .Serialize("lan",                     m_lan)
+       .Serialize("persistence_qos_profile", m_persistence_profile);
 }
 
 void AssetConfiguration::Deserialize(ConfigSerializer &desr)
 {
-    desr.Deserialize("id",          m_id)
-        .Deserialize("key",         m_key)
-        .Deserialize("description", m_description)
-        .Deserialize("vpn",         m_vpn)
-        .Deserialize("lan",         m_lan);
+    desr.Deserialize("id",                      m_id)
+        .Deserialize("key",                     m_key)
+        .Deserialize("description",             m_description)
+        .Deserialize("vpn",                     m_vpn)
+        .Deserialize("lan",                     m_lan)
+        .Deserialize("persistence_qos_profile", m_persistence_profile);
 }
 
 void AssetConfigurationList::Serialize(ConfigSerializer &/*ser*/)

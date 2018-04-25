@@ -27,6 +27,7 @@ protected:
     int m_id;
     QString m_key;
     QString m_description;
+    QString m_persistence_profile;
     QJsonObject m_vpn;
     QJsonObject m_lan;
 };
