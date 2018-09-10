@@ -9,9 +9,11 @@
 #include <QFile>
 #include <QDir>
 
-#define QOS_DIR  "/mineq/device/qos"
-#define DEVICE_QOS_FILE QOS_DIR "/USER_QOS_PROFILES.xml"
-#define PERS_QOS_FILE QOS_DIR "/Persistence.xml"
+#define DEVICE_ROOT "/mineq/device/"
+#define QOS_DIR  DEVICE_ROOT "qos/"
+#define DEVICE_QOS_FILE QOS_DIR "USER_QOS_PROFILES.xml"
+#define PERS_QOS_FILE QOS_DIR "Persistence.xml"
+#define DOCKER_COMPOSE_FILE DEVICE_ROOT "devicedockercompose.yml"
 
 AssetConfigProcessWidget::AssetConfigProcessWidget(JsonConfiguration* configuration, QWidget *parent)
     : QWidget(parent)
@@ -89,7 +91,7 @@ void AssetConfigProcessWidget::StartConfiguration(QString & usbMountedPath, ICon
     }
 }
 
-void AssetConfigProcessWidget::ApplyOneQOS(JsonConfiguration *cfg, const QString &strNodeName, QString strFileName) {
+void AssetConfigProcessWidget::ApplyOneNodeToFile(JsonConfiguration *cfg, const QString &strNodeName, QString strFileName) {
     QString strQTQOS;
     cfg->TakeValue(strNodeName, strQTQOS);
 
@@ -104,15 +106,15 @@ void AssetConfigProcessWidget::ApplyOneQOS(JsonConfiguration *cfg, const QString
         strQOS.replace(it, it + strToFind.length(), "\r\n");
     }
 
-    QFile qosFile(strFileName);
+    QFile outFile(strFileName);
 
-    if(qosFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    if(outFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
     {
-        qosFile.setPermissions(QFileDevice::ReadUser | QFileDevice::WriteUser |
+        outFile.setPermissions(QFileDevice::ReadUser | QFileDevice::WriteUser |
                                QFileDevice::ReadGroup | QFileDevice::WriteGroup |
                                QFileDevice::ReadOther | QFileDevice::WriteOther );
-        qosFile.write(strQOS.c_str());
-        qosFile.close();
+        outFile.write(strQOS.c_str());
+        outFile.close();
     }
 }
 
@@ -130,8 +132,8 @@ void AssetConfigProcessWidget::ApplyQOSs(JsonConfiguration *cfg)
         dir.mkpath(".");
     }
 
-    ApplyOneQOS(cfg, "qos", DEVICE_QOS_FILE);
-    ApplyOneQOS(cfg, "persistence_qos", PERS_QOS_FILE);
+    ApplyOneNodeToFile(cfg, "qos", DEVICE_QOS_FILE);
+    ApplyOneNodeToFile(cfg, "persistence_qos", PERS_QOS_FILE);
 }
 
 void AssetConfigProcessWidget::ApplyConfiguration(QString & usbMountedPath, IConfiguration *assetConfiguration)
@@ -140,6 +142,7 @@ void AssetConfigProcessWidget::ApplyConfiguration(QString & usbMountedPath, ICon
 
     JsonConfiguration *cfg = dynamic_cast<JsonConfiguration *>(assetConfiguration);
     ApplyQOSs(cfg);
+    ApplyOneNodeToFile(cfg, "deviceDockerCompose", DOCKER_COMPOSE_FILE);
 
     QString shFile;
     m_configuration->TakeValue("shFile", shFile);

@@ -31,7 +31,7 @@ public:
 
 private:
     void ApplyQOSs(JsonConfiguration *cfg);
-    void ApplyOneQOS(JsonConfiguration *cfg, const QString &strNodeName, QString strFileName);
+    void ApplyOneNodeToFile(JsonConfiguration *cfg, const QString &strNodeName, QString strFileName);
     void ApplyConfiguration(QString & usbMountedPath, IConfiguration* assetConfiguration);
 
     void DownloadConfiguration();
