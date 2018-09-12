@@ -10,10 +10,6 @@
 #include <QDir>
 
 #define DEVICE_ROOT "/mineq/device/"
-#define QOS_DIR  DEVICE_ROOT "qos/"
-#define DEVICE_QOS_FILE QOS_DIR "USER_QOS_PROFILES.xml"
-#define PERS_QOS_FILE QOS_DIR "Persistence.xml"
-#define DOCKER_COMPOSE_FILE DEVICE_ROOT "devicedockercompose.yml"
 
 AssetConfigProcessWidget::AssetConfigProcessWidget(JsonConfiguration* configuration, QWidget *parent)
     : QWidget(parent)
@@ -91,58 +87,9 @@ void AssetConfigProcessWidget::StartConfiguration(QString & usbMountedPath, ICon
     }
 }
 
-void AssetConfigProcessWidget::ApplyOneNodeToFile(JsonConfiguration *cfg, const QString &strNodeName, QString strFileName) {
-    QString strQTQOS;
-    cfg->TakeValue(strNodeName, strQTQOS);
-
-    std::string strQOS(strQTQOS.toLatin1().data());
-
-    size_t pos;
-
-    std::string strToFind("\\r\\n");
-
-    while ((pos = strQOS.find(strToFind)) != std::string::npos) {
-        auto it = strQOS.begin() + pos;
-        strQOS.replace(it, it + strToFind.length(), "\r\n");
-    }
-
-    QFile outFile(strFileName);
-
-    if(outFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-    {
-        outFile.setPermissions(QFileDevice::ReadUser | QFileDevice::WriteUser |
-                               QFileDevice::ReadGroup | QFileDevice::WriteGroup |
-                               QFileDevice::ReadOther | QFileDevice::WriteOther );
-        outFile.write(strQOS.c_str());
-        outFile.close();
-    }
-}
-
-void AssetConfigProcessWidget::ApplyQOSs(JsonConfiguration *cfg)
-{
-    QDir dir(QOS_DIR);
-    if (dir.exists()) {
-        // sometimes folder might be created by docker and in this case it is rooted!
-        // see also https://stackoverflow.com/questions/39794793/docker-volume-option-create-folder-as-root-user
-        QProcess* proc = new QProcess();
-        proc->start(QString("sudo chmod a+rwx ") + QString(QOS_DIR));
-        proc->waitForFinished();
-        proc->close();
-    } else {
-        dir.mkpath(".");
-    }
-
-    ApplyOneNodeToFile(cfg, "qos", DEVICE_QOS_FILE);
-    ApplyOneNodeToFile(cfg, "persistence_qos", PERS_QOS_FILE);
-}
-
 void AssetConfigProcessWidget::ApplyConfiguration(QString & usbMountedPath, IConfiguration *assetConfiguration)
 {
     m_assetConfiguration = QSharedPointer<IConfiguration>(assetConfiguration);
-
-    JsonConfiguration *cfg = dynamic_cast<JsonConfiguration *>(assetConfiguration);
-    ApplyQOSs(cfg);
-    ApplyOneNodeToFile(cfg, "deviceDockerCompose", DOCKER_COMPOSE_FILE);
 
     QString shFile;
     m_configuration->TakeValue("shFile", shFile);
