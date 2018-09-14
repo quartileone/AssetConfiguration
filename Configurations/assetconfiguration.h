@@ -64,7 +64,7 @@ public:
         , m_qos(QString::null)
         , m_persistence_qos(QString::null)
         , m_device_docker_compose(QString::null)
-        , m_bandwidth_constraint(0)
+        , m_bandwidth_constraint(QString::null)
     {
     }
 
@@ -91,7 +91,7 @@ protected:
     QString m_qos; // qos for devices
     QString m_persistence_qos; // qos for persistence
     QString m_device_docker_compose; // YAML file for docker compose
-    int     m_bandwidth_constraint; // bandwidth constraint for primary tun0 interface on OpenVPN container
+    QString m_bandwidth_constraint; // bandwidth constraint for primary tun0 interface on OpenVPN container
 };
 
 
