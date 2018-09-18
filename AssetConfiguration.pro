@@ -46,8 +46,9 @@ HEADERS  += mainwindow.h \
     Configurations/deviceconfiguration.h \
     MineqWidgets/mineqmessagewidget.h \
     Configurations/currentconfiguration.h \
-    mineqtabmanager.h
+    mineqtabmanager.h \
+    qdevicewatcher.h
 
 FORMS    += mainwindow.ui
 
-unix:!macx: LIBS += -lQDeviceWatcher
+unix:!macx: LIBS += -L$$PWD/lib/ -l:libQDeviceWatcher.a
