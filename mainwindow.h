@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QDir>
 #include <QString>
+#include <QFileSystemWatcher>
 
 #include <qdevicewatcher.h>
 
@@ -42,6 +43,8 @@ private:
 private slots:
     void on_OkButton_clicked();
 
+    void on_sideloadButton_clicked();
+
     void on_cancelButton_clicked();
 
     void slot_on_table_cell_clicked(int row, int col);
@@ -54,9 +57,11 @@ private slots:
 
     void slot_on_mineq_msg_button_clicked(QString val, MineqButton but);
 
+    void slot_side_load_config_event(const QString &path);
 private:
     Ui::MainWindow          *ui;
     QDeviceWatcher          *m_usbWatcher;
+    QFileSystemWatcher      *m_vmshareWatcher;
     ConfigurationManager    *m_configManager;
     MineqTabManager         *m_tabManager;
     bool m_rebootOnUsbDetach;

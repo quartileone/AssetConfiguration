@@ -2,6 +2,7 @@
 #include <QDir>
 #include <QTableWidget>
 
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -17,11 +18,13 @@
 
 
 #define START_CONFIG_FILE_NAME "StartDeviceConfiguration.sh"
+#define SIDE_LOAD_DIR "/mineq/sideload/"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , m_usbWatcher(new QDeviceWatcher())
+    , m_vmshareWatcher(new QFileSystemWatcher())
     , m_configManager(new ConfigurationManager())
     , m_rebootOnUsbDetach(false)
 {
@@ -31,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowFlags(Qt::Window | Qt::CustomizeWindowHint);
     ui->labelConfig->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 
+    ui->sideloadButton->setVisible(false);
     ui->OkButton->setEnabled(false);
     ui->OkButton->setVisible(false);
     ui->cancelButton->setVisible(false);
@@ -44,12 +48,14 @@ MainWindow::~MainWindow()
     m_usbWatcher->disconnect();
     delete m_usbWatcher;
 
+    delete m_vmshareWatcher;
+
     delete m_tabManager;
 }
 
 bool MainWindow::Initialize()
 {
-    m_tabManager = new MineqTabManager(ui->tabWidget);
+    m_tabManager = new MineqTabManager(ui->tabWidget);    
 
     m_usbWatcher->appendEventReceiver(this);
     connect(m_usbWatcher
@@ -67,12 +73,18 @@ bool MainWindow::Initialize()
         return false;
     }
 
+    connect(m_vmshareWatcher, SIGNAL(directoryChanged(const QString &)), this, SLOT(slot_side_load_config_event(const QString &)));
+    QString sideLoadConfig = SIDE_LOAD_DIR;
+    slot_side_load_config_event(sideLoadConfig);
+    m_vmshareWatcher->addPath(sideLoadConfig);
+
     if (!m_configManager->Initialize()) {
         return false;
     }
 
     return true;
 }
+
 
 void MainWindow::Start()
 {
@@ -115,7 +127,8 @@ void MainWindow::ShowManualConfiguration(QDir moundetConfigDir)
     }
 
     ui->OkButton->setVisible(true);
-    ui->cancelButton->setVisible(true);
+    ui->cancelButton->setVisible(true);    
+    ui->sideloadButton->setVisible(false);
     m_tabManager->SetTabCount(configList->Size());
 
     int iRow = 0;
@@ -166,6 +179,21 @@ void MainWindow::ReconfigurAsset(QString mountPath)
             , SIGNAL(mineqMesgClicked(QString, MineqButton))
             , this
             , SLOT(slot_on_mineq_msg_button_clicked(QString, MineqButton)));
+}
+
+void MainWindow::on_sideloadButton_clicked(){
+
+    m_tabManager->ClearTabs();
+
+    QDir configDir(SIDE_LOAD_DIR);
+
+    if (m_configManager->IsAssetConfigured()) {
+        ReconfigurAsset(SIDE_LOAD_DIR);
+    } else {
+        ShowManualConfiguration(configDir);
+    }
+
+    slot_side_load_config_event(SIDE_LOAD_DIR);
 }
 
 
@@ -224,6 +252,22 @@ void MainWindow::slot_on_table_cell_clicked(int /*row*/, int /*col*/)
         but->setEnabled(true);
     }
 }
+
+void MainWindow::slot_side_load_config_event(const QString & path)
+{
+    QString config = path + USB_CONFIG_FILE_NAME;
+    QFile sideloadConfig(config);
+    if (sideloadConfig.exists()) {
+        ui->sideloadButton->setVisible(true);
+        TerminalCmdExecutor::UnlockScreen(m_configManager->userPassword());
+    }
+    else{
+        ui->sideloadButton->setVisible(false);
+        TerminalCmdExecutor::LockScreen();
+    }
+    sideloadConfig.close();
+}
+
 
 void MainWindow::slot_device_added(const QString &dev)
 {
