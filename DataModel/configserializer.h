@@ -4,7 +4,6 @@
 #include <QJsonObject>
 #include <QString>
 #include <QDebug>
-
 #include "iconfiguration.h"
 class IConfiguration;
 class IConfigurationList;
@@ -20,6 +19,7 @@ public:
     ConfigSerializer& Serialize(const QString& key, V& value)
     {
         QJsonValue jsonValue(value);
+
         if( !jsonValue.isUndefined() && !jsonValue.isNull()) {
             m_root.insert(key, jsonValue);
         }
@@ -27,17 +27,11 @@ public:
         return *this;
     }
 
+    // overload for QString
+    ConfigSerializer& Serialize(const QString& key, QString& value);
     // overload for QJsonObject
-    ConfigSerializer& Serialize(const QString& key, QJsonObject& value)
-    {
-        if (!value.isEmpty()) {
-            QJsonValue jsonValue(value);
-            m_root.insert(key, jsonValue);
-        }
-
-        return *this;
-    }
-
+    ConfigSerializer& Serialize(const QString& key, QJsonObject& value);
+    // overload for IConfiguration
     ConfigSerializer& Serialize(const QString& key, IConfiguration* value);
 
     ConfigSerializer& Deserialize(const QString& key, QString& value);

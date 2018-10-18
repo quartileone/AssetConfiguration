@@ -87,7 +87,6 @@ void ConfigurationManager::UserDone(IConfiguration* configuration)
     m_isAssetConfigured = true;
 }
 
-
 QString ConfigurationManager::mountPath() const
 {
     Directories dirs = m_configuration->directories();

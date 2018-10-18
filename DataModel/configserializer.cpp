@@ -1,14 +1,29 @@
 
 #include <QJsonDocument>
 #include <QJsonArray>
-#include <QDebug>
 
 #include "configserializer.h"
 
 #include "Configurations/jsonconfiguration.h"
 
+ConfigSerializer& ConfigSerializer::Serialize(const QString& key, QString& value) {
+    if (!value.isNull()) {
+        return Serialize<QString>(key, value);
+    }
+    return *this;
+}
 
-ConfigSerializer &ConfigSerializer::Serialize(const QString &key, IConfiguration* value)
+ConfigSerializer& ConfigSerializer::Serialize(const QString& key, QJsonObject& value)
+{
+    if (!value.isEmpty()) {
+        QJsonValue jsonValue(value);
+        m_root.insert(key, jsonValue);
+    }
+
+    return *this;
+}
+
+ConfigSerializer& ConfigSerializer::Serialize(const QString &key, IConfiguration* value)
 {
     ConfigSerializer ser;
     value->Serialize(ser);
@@ -24,9 +39,11 @@ ConfigSerializer &ConfigSerializer::Serialize(const QString &key, IConfiguration
 ConfigSerializer &ConfigSerializer::Deserialize(const QString &key, QString &value)
 {
     QJsonValue jsonVal = m_root.value(key);
+
     if (!jsonVal.isUndefined()) {
         value = jsonVal.toString();
     }
+
     return *this;
 }
 
