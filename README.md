@@ -25,3 +25,8 @@ When this utility is run the following input parameters are expected
 ## Online documentation
 
 [see this]( https://confluence.quartileone.com/x/EyQQAw )
+
+
+## Why is this code public
+
+This code is a public repository because it uses the QT library which is only available for use for free under the [GNU LGPL license](http://doc.qt.io/qt-5/licensing.html).
