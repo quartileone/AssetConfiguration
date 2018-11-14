@@ -49,6 +49,8 @@ HEADERS  += mainwindow.h \
     mineqtabmanager.h \
     qdevicewatcher.h
 
-FORMS    += mainwindow.ui
+FORMS     += mainwindow.ui
 
-unix:!macx: LIBS += -L$$PWD/lib/ -l:libQDeviceWatcher.a
+RESOURCES += mainwindow.qrc
+
+unix:!macx: LIBS += -L$$PWD/lib/ -lQDeviceWatcher

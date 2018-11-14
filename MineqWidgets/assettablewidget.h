@@ -13,7 +13,7 @@ class AssetTableWidget
     Q_OBJECT
 
 public:
-    AssetTableWidget(QWidget *parent = 0);
+    AssetTableWidget(QWidget *parent = nullptr);
     ~AssetTableWidget();
 
     void Initialize(SiteConfiguration* configuration);
@@ -38,10 +38,7 @@ public:
         this->setText(configuration->description());
     }
 
-    ~AssetTableWidgetItem()
-    {
-        delete m_configuration;
-    }
+    virtual ~AssetTableWidgetItem();
 
     AssetConfiguration* configuration() { return dynamic_cast<AssetConfiguration *>(m_configuration); }
 

@@ -49,9 +49,9 @@ private slots:
 
     void slot_on_table_cell_clicked(int row, int col);
 
-    void slot_device_added(const QString& dev);
+    void slot_usb_added(const QString& dev);
 
-    void slot_device_removed(const QString& dev);
+    void slot_usb_removed(const QString& dev);
 
     void slot_configuration_finished(IConfiguration* configuration, ConfigurationType configType);
 

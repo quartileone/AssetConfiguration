@@ -7,8 +7,7 @@
 
 #include "mineqmessagewidget.h"
 
-MineqMessageWidget::MineqMessageWidget(QString workingDir, QWidget *parent)
-    : QWidget(parent), m_workingDir(workingDir)
+MineqMessageWidget::MineqMessageWidget(QWidget *parent): QWidget(parent)
 {
 
 }
@@ -122,16 +121,16 @@ void MineqMessageWidget::InitializeWidget(QVBoxLayout &vertLayout
 
     switch(msgType) {
     case MessageInfoType::Critical:
-        pix = QPixmap(m_workingDir + "/images/ic_error.png");
+        pix = QPixmap(":/images/ic_error.png");
         break;
     case MessageInfoType::Information:
-        pix = QPixmap(m_workingDir + "/images/ic_info.png");
+        pix = QPixmap("/images/ic_info.png");
         break;
     case MessageInfoType::Question:
-        pix = QPixmap(m_workingDir + "/images/ic_question.png");
+        pix = QPixmap("/images/ic_question.png");
         break;
     case MessageInfoType::Default:
-        pix = QPixmap(m_workingDir + "/images/ic_key.png");
+        pix = QPixmap("/images/ic_key.png");
     default:
         break;
     }

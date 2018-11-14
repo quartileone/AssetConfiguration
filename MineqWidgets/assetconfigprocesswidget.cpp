@@ -25,18 +25,16 @@ AssetConfigProcessWidget::AssetConfigProcessWidget(JsonConfiguration* configurat
                                 "font: 18pt;"
                            "}");
 
-    QString workingPath;
-    m_configuration->TakeValue("workingPath", workingPath);
-    m_progress->setFileName(workingPath + "/images/loader_mineq.gif");
+    m_progress->setFileName(":/images/loader_mineq.gif");
 
     QVBoxLayout* vertLayout = new QVBoxLayout();
     vertLayout->setAlignment(Qt::AlignCenter);
 
-    QLabel* progresLabel = new QLabel();
-    progresLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    progresLabel->setStyleSheet(strLabelStyle);
-    progresLabel->setMovie(m_progress);
-    vertLayout->addWidget(progresLabel);
+    QLabel* progressLabel = new QLabel();
+    progressLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    progressLabel->setStyleSheet(strLabelStyle);
+    progressLabel->setMovie(m_progress);
+    vertLayout->addWidget(progressLabel);
 
     m_logsLabel->setStyleSheet(strLabelStyle);
     m_logsLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
