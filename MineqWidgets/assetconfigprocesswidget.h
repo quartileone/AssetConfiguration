@@ -24,10 +24,10 @@ class AssetConfigProcessWidget
 {
     Q_OBJECT
 public:
-    explicit AssetConfigProcessWidget(JsonConfiguration* configuration, QWidget *parent = 0);
+    explicit AssetConfigProcessWidget(JsonConfiguration* configuration, QWidget *parent = nullptr);
     ~AssetConfigProcessWidget();
 
-    void StartConfiguration(QString & usbMountedPath, IConfiguration* assetConfiguration = NULL);
+    void StartConfiguration(QString & usbMountedPath, IConfiguration* assetConfiguration = nullptr);
 
 private:
     void ApplyConfiguration(QString & usbMountedPath, IConfiguration* assetConfiguration);

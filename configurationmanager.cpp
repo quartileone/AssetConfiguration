@@ -9,9 +9,9 @@
 #include "Configurations/deviceconfiguration.h"
 #include "Configurations/assetconfiguration.h"
 
-#define LOCAL_CONFIG_FILE         "/mineq/usb-configuration/LocalConfig.json"
-#define DEVICE_CONFIG_FILE_NAME   "deviceconfig.json"
-#define CURRENT_CONFIG_FILE_NAME  "CurrentConfig.json"
+#define LOCAL_CONFIG_FILE        "/mineq/usb-configuration/LocalConfig.json"
+#define DEVICE_CONFIG_FILE_NAME  "deviceconfig.json"
+#define CURRENT_CONFIG_FILE_NAME "CurrentConfig.json"
 
 
 bool ConfigurationManager::Initialize()
@@ -57,7 +57,7 @@ SiteConfigurationList* ConfigurationManager::GetAvailableConfiguration(QString c
     return configList;
 }
 
-void ConfigurationManager::UserDone(IConfiguration* configuration)
+void ConfigurationManager::UserDone(IConfigurationPtr configuration)
 {
     DeviceConfiguration deviceConfig;
     // firstly deserialize local config
@@ -80,7 +80,7 @@ void ConfigurationManager::UserDone(IConfiguration* configuration)
     AssetConfiguration assetConfig;
     siteConfig.TakeValue("assetConfigs", &assetConfig);
     m_currentConfiguration.setId(assetConfig.id());
-    m_currentConfiguration.setAsset(assetConfig.description());
+    m_currentConfiguration.setAsset(assetConfig.key());
 
     SaveConfiguration(m_currentConfiguration);
 

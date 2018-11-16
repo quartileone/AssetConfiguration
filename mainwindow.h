@@ -25,7 +25,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
     bool Initialize();
@@ -33,7 +33,7 @@ public:
     void Start();
 
 private:
-    void ShowManualConfiguration(QDir moundetConfigDir);
+    void ShowManualConfiguration(QDir mountedConfigDir);
 
     void ShowDefaultView();
 
@@ -53,19 +53,19 @@ private slots:
 
     void slot_usb_removed(const QString& dev);
 
-    void slot_configuration_finished(IConfiguration* configuration, ConfigurationType configType);
+    void slot_configuration_finished(IConfigurationPtr configuration, ConfigurationType configType);
 
     void slot_on_mineq_msg_button_clicked(QString val, MineqButton but);
 
     void slot_side_load_config_event(const QString &path);
 private:
-    Ui::MainWindow          *ui;
-    QDeviceWatcher          *m_usbWatcher;
-    QFileSystemWatcher      *m_vmshareWatcher;
-    ConfigurationManager    *m_configManager;
-    MineqTabManager         *m_tabManager;
-    bool m_rebootOnUsbDetach;
-    QString m_mountedPath;
+    Ui::MainWindow       *ui;
+    QDeviceWatcher       *m_usbWatcher;
+    QFileSystemWatcher   *m_vmshareWatcher;
+    ConfigurationManager *m_configManager;
+    MineqTabManager      *m_tabManager;
+    bool                 m_rebootOnUsbDetach;
+    QString              m_mountedPath;
 };
 
 #endif // MAINWINDOW_H

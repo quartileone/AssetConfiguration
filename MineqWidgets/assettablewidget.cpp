@@ -10,7 +10,7 @@
 #define COLUMN_COUNT 3
 
 AssetTableWidget::AssetTableWidget(QWidget *parent)
-    : QTableWidget(parent)
+    : QTableWidget(parent), m_configuration(new JsonConfiguration())
 {
     QFont fnt;
     fnt.setPointSize(16);
@@ -18,19 +18,9 @@ AssetTableWidget::AssetTableWidget(QWidget *parent)
     this->setFont(fnt);
 }
 
-AssetTableWidget::~AssetTableWidget()
+void AssetTableWidget::Initialize(SiteConfigurationPtr configuration)
 {
-    delete m_configuration;
-}
-
-
-void AssetTableWidget::Initialize(SiteConfiguration* configuration)
-{
-    JsonConfiguration* assetConfig = new JsonConfiguration();
-    assetConfig->InsertConfiguration("", configuration);
-
-    m_configuration = assetConfig;
-
+    m_configuration->InsertConfiguration("", configuration);
     this->setColumnCount(COLUMN_COUNT);
     this->setRowCount((configuration->Assets().Size() + COLUMN_COUNT - 1) / COLUMN_COUNT);
 
@@ -42,7 +32,7 @@ void AssetTableWidget::Initialize(SiteConfiguration* configuration)
         rowToPast += i % COLUMN_COUNT == 0 ? 1 : 0;
         colmToPast = i % COLUMN_COUNT == 0 ? 0 : colmToPast;
 
-        AssetTableWidgetItem* assetCell = new AssetTableWidgetItem(configuration->Assets().Item(i));
+        AssetTableWidgetItem* assetCell = new AssetTableWidgetItem(configuration->Assets().Item<AssetConfiguration>(i));
         assetCell->setTextAlignment(Qt::AlignCenter);
         this->setItem(rowToPast, colmToPast, assetCell);
 
@@ -93,7 +83,3 @@ void AssetTableWidget::InitStyleShit()
     headerView->setDefaultSectionSize(50);
 }
 
-AssetTableWidgetItem::~AssetTableWidgetItem()
-{
-    delete m_configuration;
-}

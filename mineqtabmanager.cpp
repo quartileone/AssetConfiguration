@@ -31,6 +31,16 @@ void MineqTabManager::SetTabCount(int tabCount)
                                 "color: rgb(106, 158, 236);"
                                 "text-decoration: underline;"
                             "}"
+                            /* just want to make tab buttons bigger...
+                            "QTabBar::QToolButtons"
+                            "{"
+                              "width: 50px;"
+                            "}"
+                            "QTabBar::scroller"
+                            "{"
+                              "width: 100px;"
+                            "}"
+                            */
                             "QTabBar::tab"
                             "{"
                                 "border: none;"
@@ -39,7 +49,7 @@ void MineqTabManager::SetTabCount(int tabCount)
                                 "color: white;");
 
     QRect rec = QApplication::desktop()->screenGeometry();
-    int iSiteSize = rec.width() / tabCount;
+    int iSiteSize = (rec.width()) / tabCount;
     strTabBarStyle += "width:";
     strTabBarStyle += iSiteSize > MIN_SITE_TAB_SIZE ? QString::number(iSiteSize) : QString::number(MIN_SITE_TAB_SIZE);
     strTabBarStyle += "}";

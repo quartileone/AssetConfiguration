@@ -120,8 +120,9 @@ void AssetConfigProcessWidget::slot_config_downloaded(QNetworkReply *reply)
         ConfigSerializer::DeserializeS(siteConfigList, strReplyContent);
 
         JsonConfiguration assetConfig;
-        assetConfig.InsertConfiguration("", siteConfigList.Item(0));
-        assetConfig.InsertConfiguration("", siteConfigList.Item(0)->Assets().Item(0));
+        assetConfig.InsertConfiguration("", siteConfigList.Item<IConfiguration>(0));
+        // why on the earth on 1st asset only???
+        assetConfig.InsertConfiguration("", siteConfigList.Item<SiteConfiguration>(0)->Assets().Item<IConfiguration>(0));
 
         QString str;
         ApplyConfiguration(str, &assetConfig);

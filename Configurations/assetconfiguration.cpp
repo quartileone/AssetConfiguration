@@ -1,6 +1,5 @@
-
 #include <QJsonArray>
-
+#include <memory>
 #include "assetconfiguration.h"
 
 
@@ -29,13 +28,23 @@ void AssetConfigurationList::Serialize(ConfigSerializer &/*ser*/)
 
 }
 
-void AssetConfigurationList::Deserialize(ConfigSerializer &desr)
-{
-    IConfiguration* siteConfig = new AssetConfiguration();
-    siteConfig->Deserialize(desr);
-    this->Add(siteConfig);
+void AssetConfigurationList::SortAssets() {
+    std::sort(m_list.begin(), m_list.end(), [this](const std::shared_ptr<IConfiguration> &lhs,
+                                                   const std::shared_ptr<IConfiguration> &rhs) {
+        const QString &lhsd = dynamic_cast<AssetConfiguration *>(lhs.get())->key();
+        const QString &rhsd = dynamic_cast<AssetConfiguration *>(rhs.get())->key();
+
+        return QString::compare(lhsd, rhsd, Qt::CaseInsensitive) < 0;
+    });
 }
 
+void AssetConfigurationList::Deserialize(ConfigSerializer &desr)
+{
+    // logically it should be the same as in SiteConfigurationList but code is written in another way...
+    std::shared_ptr<IConfiguration> assetConfig(new AssetConfiguration());
+    assetConfig->Deserialize(desr);
+    this->Add(assetConfig);
+}
 
 void SiteConfiguration::Serialize(ConfigSerializer &ser)
 {
@@ -66,6 +75,8 @@ void SiteConfiguration::Deserialize(ConfigSerializer &desr)
         .Deserialize("persistence_qos", m_persistence_qos)
         .Deserialize("deviceDockerCompose", m_device_docker_compose)
         .Deserialize("bandwidthConstraint", m_bandwidth_constraint);
+    // instead of sorting right inside AssetConfigurationList we should do that here:
+    m_assets.SortAssets();
 }
 
 
@@ -74,15 +85,27 @@ void SiteConfigurationList::Serialize(ConfigSerializer &/*ser*/)
 
 }
 
+void SiteConfigurationList::SortSites() {
+    std::sort(m_list.begin(), m_list.end(), [this](const std::shared_ptr<IConfiguration> &lhs,
+                                                   const std::shared_ptr<IConfiguration> &rhs) {
+        const QString &lhsd = dynamic_cast<SiteConfiguration *>(lhs.get())->description();
+        const QString &rhsd = dynamic_cast<SiteConfiguration *>(rhs.get())->description();
+
+        return QString::compare(lhsd, rhsd, Qt::CaseInsensitive) < 0;
+    });
+}
+
 void SiteConfigurationList::Deserialize(ConfigSerializer &desr)
 {
     QJsonArray siteArr = desr.root().value("siteConfigs").toArray();
 
+    CLear();
     foreach (QJsonValue val, siteArr) {
         ConfigSerializer deserializer;
         deserializer.setRoot(val.toObject());
-        IConfiguration* siteConfig = new SiteConfiguration();
+        std::shared_ptr<IConfiguration> siteConfig(new SiteConfiguration());
         siteConfig->Deserialize(deserializer);
-        this->Add(siteConfig);
+        Add(siteConfig);
     }
+    SortSites();
 }

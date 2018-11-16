@@ -25,7 +25,7 @@ public:
 
     SiteConfigurationList* GetAvailableConfiguration(QString configFilePath);
 
-    void UserDone(IConfiguration* configuration);
+    void UserDone(IConfigurationPtr configuration);
 
     bool IsAssetConfigured() const { return m_isAssetConfigured; }
 

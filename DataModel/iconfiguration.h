@@ -1,8 +1,7 @@
-#ifndef ICONFIGURATION_H
-#define ICONFIGURATION_H
+#pragma once
 
-#include <QVector>
-#include <QSharedPointer>
+#include <vector>
+#include <memory>
 
 #include "configserializer.h"
 
@@ -22,6 +21,8 @@ public:
 
 };
 
+typedef std::shared_ptr<IConfiguration> IConfigurationPtr;
+
 class IConfigurationList
         : public IConfiguration
 {
@@ -31,23 +32,23 @@ public:
 
     }
 
-    void Add(IConfiguration* item)
+    void Add(IConfigurationPtr &item)
     {
-        m_list.push_back(QSharedPointer<IConfiguration>(item));
+        m_list.push_back(std::move(item));
     }
 
     int Size() const { return m_list.size(); }
 
     void CLear() { m_list.clear(); }
 
-    virtual IConfiguration* Item(int index)
+    template <typename RetType>
+    std::shared_ptr<RetType> Item(int index)
     {
-        return m_list[index].data();
+        return std::dynamic_pointer_cast<RetType>(m_list[index]);
     }
 
 
 protected:
-    QVector<QSharedPointer<IConfiguration>> m_list;
+    std::vector<IConfigurationPtr> m_list;
 };
 
-#endif // ICONFIGURATION_H

@@ -2,48 +2,48 @@
 #define ASSETTABLEWIDGET_H
 
 #include <QTableWidget>
+#include <memory>
 #include <QSharedPointer>
 
 #include "Configurations/assetconfiguration.h"
 #include "Configurations/jsonconfiguration.h"
 
-class AssetTableWidget
-        : public QTableWidget
+class AssetTableWidget : public QTableWidget
 {
     Q_OBJECT
 
 public:
     AssetTableWidget(QWidget *parent = nullptr);
-    ~AssetTableWidget();
+    AssetTableWidget(const AssetTableWidget &) = delete;
+    AssetTableWidget& operator = (const AssetTableWidget&) = delete;
 
-    void Initialize(SiteConfiguration* configuration);
+    void Initialize(SiteConfigurationPtr configuration);
 
-    JsonConfiguration* configuration() { return dynamic_cast<JsonConfiguration *>(m_configuration); }
+    JsonConfigurationPtr configuration() {
+        return std::dynamic_pointer_cast<JsonConfiguration>(m_configuration);
+    }
 
 private:
     void InitStyleShit();
 
 private:
-    IConfiguration* m_configuration;
+    std::shared_ptr<JsonConfiguration> m_configuration;
 };
 
 
-class AssetTableWidgetItem
-        : public QTableWidgetItem
+class AssetTableWidgetItem: public QTableWidgetItem
 {
 public:
-    AssetTableWidgetItem(AssetConfiguration* configuration)
+    AssetTableWidgetItem(AssetConfigurationPtr configuration)
         : m_configuration(configuration)
     {
-        this->setText(configuration->description());
+        this->setText(configuration->key());
     }
 
-    virtual ~AssetTableWidgetItem();
-
-    AssetConfiguration* configuration() { return dynamic_cast<AssetConfiguration *>(m_configuration); }
+    IConfigurationPtr configuration() { return m_configuration; }
 
 private:
-    IConfiguration* m_configuration;
+    AssetConfigurationPtr m_configuration;
 };
 
 #endif // ASSETTABLEWIDGET_H

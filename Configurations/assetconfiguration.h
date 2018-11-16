@@ -15,7 +15,7 @@ public:
     {
     }
 
-    QString description() const { return m_description; }
+    QString key() const { return m_key; }
     int id() const { return m_id; }
 
 // IConfiguration implementation
@@ -32,6 +32,7 @@ protected:
     QJsonObject m_lan;
 };
 
+typedef std::shared_ptr<AssetConfiguration> AssetConfigurationPtr;
 
 class AssetConfigurationList
         : public IConfigurationList
@@ -41,14 +42,11 @@ public:
     {
     }
 
-    AssetConfiguration* Item(int index) override
-    {
-        return static_cast<AssetConfiguration *>(m_list[index].data());
-    }
+    void SortAssets();
 
 private:
     virtual void Serialize(ConfigSerializer& ser) override;
-    virtual void Deserialize(ConfigSerializer& desr) override;
+    virtual void Deserialize(ConfigSerializer&) override;
 };
 
 
@@ -94,6 +92,8 @@ protected:
     QString m_bandwidth_constraint; // bandwidth constraint for primary tun0 interface on OpenVPN container
 };
 
+typedef std::shared_ptr<SiteConfiguration> SiteConfigurationPtr;
+
 
 class SiteConfigurationList
         : public IConfigurationList
@@ -103,12 +103,8 @@ public:
     {
     }
 
-    SiteConfiguration* Item(int index) override
-    {
-        return static_cast<SiteConfiguration *>(m_list[index].data());
-    }
-
 private:
+    void SortSites();
     virtual void Serialize(ConfigSerializer& ser) override;
     virtual void Deserialize(ConfigSerializer& desr) override;
 

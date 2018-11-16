@@ -178,7 +178,7 @@ color: white;</string>
          <property name="styleSheet">
           <string notr="true">border-width: 1px;
 border-bottom-style: solid;
-border-color: blue;
+border-color:rgb(106, 158, 236);
 </string>
          </property>
          <property name="frame">
@@ -208,6 +208,9 @@ border-color: blue;
       </property>
       <property name="currentIndex">
        <number>-1</number>
+      </property>
+      <property name="tabsClosable">
+       <bool>false</bool>
       </property>
      </widget>
     </item>
