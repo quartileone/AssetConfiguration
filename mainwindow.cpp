@@ -4,7 +4,6 @@
 
 
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
 
 #include "Utilities/terminalcmdexecutor.h"
 #include "Utilities/usbconfigmounter.h"
@@ -26,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent)
     , m_usbWatcher(new QDeviceWatcher())
     , m_vmshareWatcher(new QFileSystemWatcher())
     , m_configManager(new ConfigurationManager())
+    , m_tabManager (new MineqTabManager(ui->tabWidget, ui->edSearch))
     , m_rebootOnUsbDetach(false)
 {
     ui->setupUi(this);
@@ -42,29 +42,20 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    delete ui;
-    delete m_configManager;
-
     m_usbWatcher->disconnect();
-    delete m_usbWatcher;
-
-    delete m_vmshareWatcher;
-
-    delete m_tabManager;
+    m_vmshareWatcher->disconnect();
 }
 
 bool MainWindow::Initialize()
 {
-    m_tabManager = new MineqTabManager(ui->tabWidget);
-
     m_usbWatcher->appendEventReceiver(this);
-    connect(m_usbWatcher
+    connect(m_usbWatcher.get()
             , SIGNAL(deviceAdded(QString))
             , this
             , SLOT(slot_usb_added(QString))
             , Qt::DirectConnection);
 
-    connect(m_usbWatcher
+    connect(m_usbWatcher.get()
             , SIGNAL(deviceRemoved(QString))
             , this
             , SLOT(slot_usb_removed(QString))
@@ -73,7 +64,7 @@ bool MainWindow::Initialize()
         return false;
     }
 
-    connect(m_vmshareWatcher, SIGNAL(directoryChanged(const QString &)), this,
+    connect(m_vmshareWatcher.get(), SIGNAL(directoryChanged(const QString &)), this,
             SLOT(slot_side_load_config_event(const QString &)));
     QString sideLoadConfig = SIDE_LOAD_DIR;
     slot_side_load_config_event(sideLoadConfig);
@@ -161,7 +152,7 @@ void MainWindow::ReconfigurAsset(QString mountPath)
             , SLOT(slot_on_mineq_msg_button_clicked(QString, MineqButton)));
 }
 
-void MainWindow::on_sideloadButton_clicked(){
+void MainWindow::on_sideloadButton_clicked() {
 
     m_tabManager->ClearTabs();
 
@@ -183,9 +174,10 @@ void MainWindow::on_OkButton_clicked()
     ui->cancelButton->setVisible(false);
 
     AssetTableWidget* assetTable = dynamic_cast<AssetTableWidget*>(ui->tabWidget->currentWidget());
-    AssetTableWidgetItem* tableItem = dynamic_cast<AssetTableWidgetItem*>(assetTable->item(assetTable->currentRow(), assetTable->currentColumn()));
+    AssetTableWidgetItem* tableItem = dynamic_cast<AssetTableWidgetItem*>
+            (assetTable->item(assetTable->currentRow(), assetTable->currentColumn()));
 
-    JsonConfiguration* pocessConfig = new JsonConfiguration();
+    std::unique_ptr<JsonConfiguration> pocessConfig(new JsonConfiguration());
     pocessConfig->InsertValue("shFile", m_configManager->workingPath() + QDir::separator() + START_CONFIG_FILE_NAME);
     pocessConfig->InsertValue("url", m_configManager->configUrl());
     pocessConfig->InsertValue("workingPath", m_configManager->workingPath());
@@ -196,7 +188,7 @@ void MainWindow::on_OkButton_clicked()
             , this
             , SLOT(slot_configuration_finished(IConfiguration*, ConfigurationType)));
 
-    JsonConfiguration* assetConfiguration = new JsonConfiguration();
+    JsonConfigurationPtr assetConfiguration(new JsonConfiguration());
 
     assetConfiguration->InsertConfiguration("", assetTable->configuration());
     assetConfiguration->InsertConfiguration("assetConfigs", tableItem->configuration());
@@ -222,14 +214,12 @@ void MainWindow::on_cancelButton_clicked()
 
 void MainWindow::slot_on_table_cell_clicked(int /*row*/, int /*col*/)
 {
-    QPushButton *but = ui->centralWidget->findChild<QPushButton*>("OkButton");
-
     QTableWidget* tableWidget = dynamic_cast<QTableWidget *>(ui->tabWidget->currentWidget());
     QTableWidgetItem* tableItem = tableWidget->item(tableWidget->currentRow(), tableWidget->currentColumn());
 
     if (tableItem) {
-        but->setStyleSheet("border: none; color: #FFFFFF; background-color: rgb(106, 158, 236); margin-right: 40px");
-        but->setEnabled(true);
+        ui->OkButton->setStyleSheet("border: none; color: #FFFFFF; background-color: rgb(106, 158, 236); margin-right: 40px");
+        ui->OkButton->setEnabled(true);
     }
 }
 
@@ -250,7 +240,8 @@ void MainWindow::slot_side_load_config_event(const QString & path)
 
 void MainWindow::slot_usb_added(const QString &dev)
 {
-    UsbConfigMounter* configMounter = new UsbConfigMounter(QDir(dev));
+    std::shared_ptr<UsbConfigMounter> configMounter(new UsbConfigMounter(QDir(dev)));
+
     configMounter->MountConfigUsbFlash(m_configManager->mountPath());
     if (configMounter->IsConfigUsbFlash()) {
         m_tabManager->ClearTabs();
@@ -268,18 +259,17 @@ void MainWindow::slot_usb_added(const QString &dev)
             configMounter->UnmountConfigUsbFlash(m_configManager->mountPath());
         }
     }
-
-    delete configMounter;
 }
 
 void MainWindow::slot_usb_removed(const QString &dev)
 {
-    UsbConfigMounter* configMounter = new UsbConfigMounter(QDir(dev));
-    if (configMounter->IsMounteDirExist(m_configManager->mountPath())) {
-        configMounter->UnmountConfigUsbFlash(m_configManager->mountPath());
-    }
+    {
+        std::shared_ptr<UsbConfigMounter> configMounter(new UsbConfigMounter(QDir(dev)));
 
-    delete configMounter;
+        if (configMounter->IsMounteDirExist(m_configManager->mountPath())) {
+            configMounter->UnmountConfigUsbFlash(m_configManager->mountPath());
+        }
+    }
 
     if(m_rebootOnUsbDetach) {
         TerminalCmdExecutor::Reboot();
@@ -316,7 +306,7 @@ void MainWindow::slot_configuration_finished(IConfigurationPtr configuration, Co
 
 void MainWindow::slot_on_mineq_msg_button_clicked(QString val, MineqButton but)
 {
-    if(but == MineqButton::Yes) {
+    if (but == MineqButton::Yes) {
         m_tabManager->ClearTabs();
         ShowManualConfiguration(QDir(val));
     } else {
@@ -324,4 +314,10 @@ void MainWindow::slot_on_mineq_msg_button_clicked(QString val, MineqButton but)
         m_tabManager->ClearTabs();
         ShowDefaultView();
     }
+}
+
+
+void MainWindow::on_edSearch_textChanged(const QString &strNewTest)
+{
+
 }

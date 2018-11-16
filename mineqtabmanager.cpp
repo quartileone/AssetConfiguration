@@ -6,8 +6,8 @@
 
 #define MIN_SITE_TAB_SIZE 150
 
-MineqTabManager::MineqTabManager(QTabWidget *tabWidget)
-        : m_tabWidget(tabWidget)
+MineqTabManager::MineqTabManager(QTabWidget *tabWidget, QLineEdit* filter)
+        : m_tabWidget(tabWidget), m_filter(filter)
 {
 
 }
@@ -66,4 +66,5 @@ void MineqTabManager::ClearTabs()
     }
 
     m_tabWidget->clear();
+    m_filter->setVisible(false);
 }

@@ -5,7 +5,7 @@
 #include <QDir>
 #include <QString>
 #include <QFileSystemWatcher>
-
+#include "ui_mainwindow.h"
 #include <qdevicewatcher.h>
 
 #include "configurationmanager.h"
@@ -58,14 +58,17 @@ private slots:
     void slot_on_mineq_msg_button_clicked(QString val, MineqButton but);
 
     void slot_side_load_config_event(const QString &path);
+
+    void on_edSearch_textChanged(const QString &strNewTest);
+
 private:
-    Ui::MainWindow       *ui;
-    QDeviceWatcher       *m_usbWatcher;
-    QFileSystemWatcher   *m_vmshareWatcher;
-    ConfigurationManager *m_configManager;
-    MineqTabManager      *m_tabManager;
-    bool                 m_rebootOnUsbDetach;
-    QString              m_mountedPath;
+    Ui::MainWindow *                      ui;
+    std::unique_ptr<QDeviceWatcher>       m_usbWatcher;
+    std::unique_ptr<QFileSystemWatcher>   m_vmshareWatcher;
+    std::unique_ptr<ConfigurationManager> m_configManager;
+    std::unique_ptr<MineqTabManager>      m_tabManager;
+    bool                                  m_rebootOnUsbDetach;
+    QString                               m_mountedPath;
 };
 
 #endif // MAINWINDOW_H
