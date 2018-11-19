@@ -47,8 +47,6 @@ private slots:
 
     void on_cancelButton_clicked();
 
-    void slot_on_table_cell_clicked(int row, int col);
-
     void slot_usb_added(const QString& dev);
 
     void slot_usb_removed(const QString& dev);
@@ -59,7 +57,7 @@ private slots:
 
     void slot_side_load_config_event(const QString &path);
 
-    void on_edSearch_textChanged(const QString &strNewTest);
+    void on_edSearch_textChanged(const QString &arg1);
 
 private:
     Ui::MainWindow *                      ui;

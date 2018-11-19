@@ -31,7 +31,6 @@ public:
 
 private:
     void ApplyConfiguration(QString & usbMountedPath, JsonConfigurationPtr &assetConfiguration);
-
     void DownloadConfiguration();
 
 signals:

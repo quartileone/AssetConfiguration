@@ -4,6 +4,7 @@
 #include <QTableWidget>
 #include <memory>
 #include <QSharedPointer>
+#include <QPushButton>
 
 #include "Configurations/assetconfiguration.h"
 #include "Configurations/jsonconfiguration.h"
@@ -17,17 +18,21 @@ public:
     AssetTableWidget(const AssetTableWidget &) = delete;
     AssetTableWidget& operator = (const AssetTableWidget&) = delete;
 
-    void Initialize(SiteConfigurationPtr configuration);
+    void Initialize(SiteConfigurationPtr configuration, QPushButton *pbOK);
 
     JsonConfigurationPtr configuration() {
         return std::dynamic_pointer_cast<JsonConfiguration>(m_configuration);
     }
 
 private:
-    void InitStyleShit();
+    void InitStyleSheet();
+
+private slots:
+    void slot_on_table_cell_clicked(int, int);
 
 private:
     std::shared_ptr<JsonConfiguration> m_configuration;
+    QPushButton * m_pbOK;
 };
 
 

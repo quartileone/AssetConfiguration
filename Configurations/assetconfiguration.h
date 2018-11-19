@@ -69,6 +69,7 @@ public:
     AssetConfigurationList& Assets() { return m_assets; }
 
     QString description() const { return m_description; }
+    void description(const QString &p_description) { m_description = p_description; }
     QString timeZone() const { return m_timeZone; }
     QJsonObject cluster() const { return m_cluster; }
     QJsonObject deviceHub() const { return m_deviceHub; }
@@ -110,6 +111,6 @@ private:
 
 };
 
-
+typedef std::unique_ptr<SiteConfigurationList> TUPSites;
 
 #endif // ASSETCONFIGURATION_H

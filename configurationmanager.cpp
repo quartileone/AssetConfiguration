@@ -44,9 +44,9 @@ bool ConfigurationManager::Initialize()
     return true;
 }
 
-SiteConfigurationList* ConfigurationManager::GetAvailableConfiguration(QString configFilePath)
+TUPSites ConfigurationManager::GetAvailableConfiguration(QString configFilePath)
 {
-    SiteConfigurationList* configList = new SiteConfigurationList();
+    TUPSites configList(new SiteConfigurationList());
     QString strJsonData = ReadJsonConfig(configFilePath);
     if (strJsonData.isEmpty()) {
         return configList;

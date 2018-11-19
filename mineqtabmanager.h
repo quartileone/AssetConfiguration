@@ -1,25 +1,29 @@
 #ifndef MINEQTABMANAGER_H
 #define MINEQTABMANAGER_H
 
+#include <map>
 #include <QTabWidget>
 #include <QLineEdit>
+#include <QPushButton>
+#include "Configurations/assetconfiguration.h"
 
 class MineqTabManager
 {
 public:
-    MineqTabManager(QTabWidget* tabWidget, QLineEdit *filter);
+    MineqTabManager(QTabWidget* tabWidget, QLineEdit *filter, QPushButton *pbOK);
 
-    void AddMineqWidget(QWidget* widget, QString text);
-
-    void SetTabCount(int tabCount);
-
+    void InitSitesConfig(TUPSites &&sitesList);
+    void AddOneCentralWidget(QWidget* widget, const QString &tabTitle);
+    void AddTableWidget();
+    void SetTabStyle(int tabCount);
     void ClearTabs();
-
     void OnSearchTextChanged(const QString &strNewText);
-
 private:
-    QTabWidget* m_tabWidget;
-    QLineEdit * m_filter;
+    QTabWidget  * m_tabWidget;
+    QLineEdit   * m_filter;
+    QPushButton * m_pbOK;
+    TUPSites    m_sitesList;
+    SiteConfigurationPtr m_AllSites;
 };
 
 #endif // MINEQTABMANAGER_H

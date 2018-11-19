@@ -2,7 +2,6 @@
 #include <QDir>
 #include <QTableWidget>
 
-
 #include "mainwindow.h"
 
 #include "Utilities/terminalcmdexecutor.h"
@@ -15,7 +14,6 @@
 
 #include "MineqWidgets/assettablewidget.h"
 
-
 #define START_CONFIG_FILE_NAME "StartDeviceConfiguration.sh"
 #define SIDE_LOAD_DIR "/mineq/sideload/"
 
@@ -25,19 +23,15 @@ MainWindow::MainWindow(QWidget *parent)
     , m_usbWatcher(new QDeviceWatcher())
     , m_vmshareWatcher(new QFileSystemWatcher())
     , m_configManager(new ConfigurationManager())
-    , m_tabManager (new MineqTabManager(ui->tabWidget, ui->edSearch))
+    , m_tabManager (nullptr)
     , m_rebootOnUsbDetach(false)
 {
     ui->setupUi(this);
+    m_tabManager.reset(new MineqTabManager(ui->tabWidget, ui->edSearch, ui->OkButton));
 
     ui->centralWidget->setAttribute(Qt::WA_QuitOnClose);
     setWindowFlags(Qt::Window | Qt::CustomizeWindowHint);
     ui->labelConfig->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-
-    ui->sideloadButton->setVisible(false);
-    ui->OkButton->setEnabled(false);
-    ui->OkButton->setVisible(false);
-    ui->cancelButton->setVisible(false);
 }
 
 MainWindow::~MainWindow()
@@ -87,31 +81,19 @@ void MainWindow::Start()
 void MainWindow::ShowManualConfiguration(QDir mountedConfigDir)
 {
     QString configFile = mountedConfigDir.absoluteFilePath(USB_CONFIG_FILE_NAME);
-    SiteConfigurationList* configList = m_configManager->GetAvailableConfiguration(configFile);
+    TUPSites configList = m_configManager->GetAvailableConfiguration(configFile);
     if (!configList) {
-        m_tabManager->SetTabCount(1);
         MineqMessageWidget* msgWidget = new MineqMessageWidget();
         msgWidget->CriticalMessage("Cannot read config file.\nThe file could be damaged or empty.\nPlease remove USB key create new file and try again.");
-        m_tabManager->AddMineqWidget(msgWidget, "Error");
-        return;
-    }
-    ui->edSearch->setVisible(true);
-    ui->OkButton->setVisible(true);
-    ui->cancelButton->setVisible(true);
-    ui->sideloadButton->setVisible(false);
-    m_tabManager->SetTabCount(configList->Size());
-
-    int iRow = 0;
-    for (int i = 0; i < configList->Size(); ++i) {
-        AssetTableWidget* assetTable = new AssetTableWidget();
-        assetTable->Initialize(configList->Item<SiteConfiguration>(i));
-        connect(assetTable
-                , SIGNAL(cellClicked(int, int))
-                , this
-                , SLOT(slot_on_table_cell_clicked(int,int)));
-
-        m_tabManager->AddMineqWidget(assetTable, configList->Item<SiteConfiguration>(i)->description());
-        ++iRow;
+        m_tabManager->AddOneCentralWidget(msgWidget, "Error");
+    } else {
+        ui->edSearch->setVisible(true);
+        ui->edSearch->setText("");
+        ui->OkButton->setVisible(true);
+        ui->cancelButton->setVisible(true);
+        ui->sideloadButton->setVisible(false);
+        m_tabManager->InitSitesConfig(std::move(configList));
+        m_tabManager->AddTableWidget();
     }
 }
 
@@ -123,16 +105,16 @@ void MainWindow::ShowDefaultView()
     ui->OkButton->setVisible(false);
     ui->cancelButton->setVisible(false);
 
-    m_tabManager->SetTabCount(1);
+    ui->edSearch->setVisible(false);
+    ui->sideloadButton->setVisible(false);
+
     MineqMessageWidget* msgWidget = new MineqMessageWidget();
     msgWidget->DefaultMessage();
-    m_tabManager->AddMineqWidget(msgWidget, "USB key");
-    ui->edSearch->setVisible(false);
+    m_tabManager->AddOneCentralWidget(msgWidget, "USB key");
 }
 
 void MainWindow::ReconfigurAsset(QString mountPath)
 {
-    m_tabManager->SetTabCount(1);
     MineqMessageWidget* msgWidget = new MineqMessageWidget();
 
     QString strMsg = "The current asset configuration is:\n";
@@ -144,7 +126,7 @@ void MainWindow::ReconfigurAsset(QString mountPath)
     strMsg += "\n\n";
     strMsg += "Do you want to reconfigure it?";
     msgWidget->QuestionMessage(mountPath, strMsg);
-    m_tabManager->AddMineqWidget(msgWidget, "Information");
+    m_tabManager->AddOneCentralWidget(msgWidget, "Information");
 
     connect(msgWidget
             , SIGNAL(mineqMesgClicked(QString, MineqButton))
@@ -193,10 +175,7 @@ void MainWindow::on_OkButton_clicked()
     assetConfiguration->InsertConfiguration("", assetTable->configuration());
     assetConfiguration->InsertConfiguration("assetConfigs", tableItem->configuration());
 
-    m_tabManager->ClearTabs();
-
-    m_tabManager->SetTabCount(1);
-    m_tabManager->AddMineqWidget(configProcWidget, "Configuring");
+    m_tabManager->AddOneCentralWidget(configProcWidget, "Configuring");
 
     configProcWidget->StartConfiguration(m_mountedPath, assetConfiguration);
 }
@@ -204,23 +183,7 @@ void MainWindow::on_OkButton_clicked()
 void MainWindow::on_cancelButton_clicked()
 {
     TerminalCmdExecutor::LockScreen();
-
-    ui->OkButton->setStyleSheet("border: none; color: #FFFFFF; background-color: rgba(106, 158, 236, 50); margin-right: 40px;");
-    ui->OkButton->setEnabled(false);
-
-    m_tabManager->ClearTabs();
     ShowDefaultView();
-}
-
-void MainWindow::slot_on_table_cell_clicked(int /*row*/, int /*col*/)
-{
-    QTableWidget* tableWidget = dynamic_cast<QTableWidget *>(ui->tabWidget->currentWidget());
-    QTableWidgetItem* tableItem = tableWidget->item(tableWidget->currentRow(), tableWidget->currentColumn());
-
-    if (tableItem) {
-        ui->OkButton->setStyleSheet("border: none; color: #FFFFFF; background-color: rgb(106, 158, 236); margin-right: 40px");
-        ui->OkButton->setEnabled(true);
-    }
 }
 
 void MainWindow::slot_side_load_config_event(const QString & path)
@@ -275,33 +238,28 @@ void MainWindow::slot_usb_removed(const QString &dev)
         TerminalCmdExecutor::Reboot();
     } else {
         TerminalCmdExecutor::LockScreen();
-
-        ui->OkButton->setStyleSheet("border: none; color: #B4CEF5; margin-right: 40px;");
-        ui->OkButton->setEnabled(false);
-
-        m_tabManager->ClearTabs();
         ShowDefaultView();
     }
 }
 
 void MainWindow::slot_configuration_finished(IConfigurationPtr configuration, ConfigurationType /*configType*/)
 {
-    m_tabManager->SetTabCount(1);
+    QString tabTitle;
     MineqMessageWidget* msgWidget = new MineqMessageWidget();
 
     if (configuration) {
         m_configManager->UserDone(configuration);
-        m_tabManager->ClearTabs();
 
         msgWidget->InformationMessage();
-        m_tabManager->AddMineqWidget(msgWidget, "Configured");
+        tabTitle = "Configured";
 
         m_rebootOnUsbDetach = true;
     } else {
-        m_tabManager->ClearTabs();
         msgWidget->CriticalMessage();
-        m_tabManager->AddMineqWidget(msgWidget, "Error");
+        tabTitle = "Error";
+
     }
+    m_tabManager->AddOneCentralWidget(msgWidget, std::move(tabTitle));
 }
 
 void MainWindow::slot_on_mineq_msg_button_clicked(QString val, MineqButton but)
@@ -311,13 +269,11 @@ void MainWindow::slot_on_mineq_msg_button_clicked(QString val, MineqButton but)
         ShowManualConfiguration(QDir(val));
     } else {
         TerminalCmdExecutor::LockScreen();
-        m_tabManager->ClearTabs();
         ShowDefaultView();
     }
 }
 
-
-void MainWindow::on_edSearch_textChanged(const QString &strNewTest)
+void MainWindow::on_edSearch_textChanged(const QString &arg1)
 {
-
+    m_tabManager->AddTableWidget();
 }

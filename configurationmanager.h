@@ -23,7 +23,7 @@ public:
 
     bool Initialize();
 
-    SiteConfigurationList* GetAvailableConfiguration(QString configFilePath);
+    TUPSites GetAvailableConfiguration(QString configFilePath);
 
     void UserDone(IConfigurationPtr configuration);
 
