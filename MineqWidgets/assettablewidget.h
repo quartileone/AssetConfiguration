@@ -18,7 +18,9 @@ public:
     AssetTableWidget(const AssetTableWidget &) = delete;
     AssetTableWidget& operator = (const AssetTableWidget&) = delete;
 
-    void Initialize(SiteConfigurationPtr configuration, QPushButton *pbOK);
+    void Initialize(SiteConfigurationPtr configuration,
+                    std::vector<IConfigurationPtr>::const_iterator &first_avail,
+                    const QString &AssetKeySearch, QPushButton *pbOK);
 
     JsonConfigurationPtr configuration() {
         return std::dynamic_pointer_cast<JsonConfiguration>(m_configuration);

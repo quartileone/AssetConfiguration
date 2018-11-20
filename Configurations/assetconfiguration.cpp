@@ -23,19 +23,19 @@ void AssetConfiguration::Deserialize(ConfigSerializer &desr)
         .Deserialize("persistence_qos_profile", m_persistence_profile);
 }
 
+AssetConfigurationList::TComparator AssetConfigurationList::m_comparator = [](const std::shared_ptr<IConfiguration> &lhs, const std::shared_ptr<IConfiguration> &rhs) {
+    const QString &lhsd = dynamic_cast<AssetConfiguration *>(lhs.get())->key();
+    const QString &rhsd = dynamic_cast<AssetConfiguration *>(rhs.get())->key();
+    return QString::compare(lhsd, rhsd, Qt::CaseInsensitive) < 0;
+};
+
 void AssetConfigurationList::Serialize(ConfigSerializer &/*ser*/)
 {
 
 }
 
 void AssetConfigurationList::SortAssets() {
-    std::sort(m_list.begin(), m_list.end(), [this](const std::shared_ptr<IConfiguration> &lhs,
-                                                   const std::shared_ptr<IConfiguration> &rhs) {
-        const QString &lhsd = dynamic_cast<AssetConfiguration *>(lhs.get())->key();
-        const QString &rhsd = dynamic_cast<AssetConfiguration *>(rhs.get())->key();
-
-        return QString::compare(lhsd, rhsd, Qt::CaseInsensitive) < 0;
-    });
+    std::sort(begin(), end(), m_comparator);
 }
 
 void AssetConfigurationList::Deserialize(ConfigSerializer &desr)
@@ -43,7 +43,7 @@ void AssetConfigurationList::Deserialize(ConfigSerializer &desr)
     // logically it should be the same as in SiteConfigurationList but code is written in another way...
     std::shared_ptr<IConfiguration> assetConfig(new AssetConfiguration());
     assetConfig->Deserialize(desr);
-    this->Add(assetConfig);
+    this->push_back(assetConfig);
 }
 
 void SiteConfiguration::Serialize(ConfigSerializer &ser)
@@ -86,7 +86,7 @@ void SiteConfigurationList::Serialize(ConfigSerializer &/*ser*/)
 }
 
 void SiteConfigurationList::SortSites() {
-    std::sort(m_list.begin(), m_list.end(), [this](const std::shared_ptr<IConfiguration> &lhs,
+    std::sort(begin(), end(), [this](const std::shared_ptr<IConfiguration> &lhs,
                                                    const std::shared_ptr<IConfiguration> &rhs) {
         const QString &lhsd = dynamic_cast<SiteConfiguration *>(lhs.get())->description();
         const QString &rhsd = dynamic_cast<SiteConfiguration *>(rhs.get())->description();
@@ -99,13 +99,14 @@ void SiteConfigurationList::Deserialize(ConfigSerializer &desr)
 {
     QJsonArray siteArr = desr.root().value("siteConfigs").toArray();
 
-    CLear();
+    clear();
+    reserve(siteArr.count());
     foreach (QJsonValue val, siteArr) {
         ConfigSerializer deserializer;
         deserializer.setRoot(val.toObject());
         std::shared_ptr<IConfiguration> siteConfig(new SiteConfiguration());
         siteConfig->Deserialize(deserializer);
-        Add(siteConfig);
+        push_back(siteConfig);
     }
     SortSites();
 }

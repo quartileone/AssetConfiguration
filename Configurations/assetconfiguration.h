@@ -3,6 +3,7 @@
 
 
 #include "Configurations/jsonconfiguration.h"
+#include <functional>
 
 class AssetConfiguration
         : public JsonConfiguration
@@ -34,24 +35,25 @@ protected:
 
 typedef std::shared_ptr<AssetConfiguration> AssetConfigurationPtr;
 
-class AssetConfigurationList
-        : public IConfigurationList
+class AssetConfigurationList : public IConfigurationList
 {
 public:
-    AssetConfigurationList()
-    {
-    }
+    using TComparator = std::function<bool(const std::shared_ptr<IConfiguration> &, const std::shared_ptr<IConfiguration> &)>;
+    AssetConfigurationList() {};
 
     void SortAssets();
 
+    static TComparator GetComparator() {
+        return m_comparator;
+    }
 private:
     virtual void Serialize(ConfigSerializer& ser) override;
     virtual void Deserialize(ConfigSerializer&) override;
+    static TComparator m_comparator;
 };
 
 
-class SiteConfiguration
-        :public JsonConfiguration
+class SiteConfiguration: public JsonConfiguration
 {
 public:
     SiteConfiguration()

@@ -93,14 +93,17 @@ void MainWindow::ShowManualConfiguration(QDir mountedConfigDir)
         ui->cancelButton->setVisible(true);
         ui->sideloadButton->setVisible(false);
         m_tabManager->InitSitesConfig(std::move(configList));
-        m_tabManager->AddTableWidget();
+        if (!m_tabManager->AddTableWidget()) {
+            MineqMessageWidget* msgWidget = new MineqMessageWidget();
+            msgWidget->InformationMessage("No assets in config.json. Please, select another one");
+            m_tabManager->AddOneCentralWidget(msgWidget, "Config loader");
+        }
     }
 }
 
 void MainWindow::ShowDefaultView()
 {
-    ui->OkButton->setStyleSheet("border: none; color: #FFFFFF; background-color: rgba(106, 158, 236, 50); margin-right: 40px;");
-    ui->OkButton->setEnabled(false);
+    DisableOKButton();
 
     ui->OkButton->setVisible(false);
     ui->cancelButton->setVisible(false);
@@ -148,7 +151,6 @@ void MainWindow::on_sideloadButton_clicked() {
 
     slot_side_load_config_event(SIDE_LOAD_DIR);
 }
-
 
 void MainWindow::on_OkButton_clicked()
 {
@@ -199,7 +201,6 @@ void MainWindow::slot_side_load_config_event(const QString & path)
     }
     sideloadConfig.close();
 }
-
 
 void MainWindow::slot_usb_added(const QString &dev)
 {
@@ -257,7 +258,6 @@ void MainWindow::slot_configuration_finished(IConfigurationPtr configuration, Co
     } else {
         msgWidget->CriticalMessage();
         tabTitle = "Error";
-
     }
     m_tabManager->AddOneCentralWidget(msgWidget, std::move(tabTitle));
 }
@@ -273,7 +273,23 @@ void MainWindow::slot_on_mineq_msg_button_clicked(QString val, MineqButton but)
     }
 }
 
-void MainWindow::on_edSearch_textChanged(const QString &arg1)
+void MainWindow::on_edSearch_textChanged(const QString &)
 {
-    m_tabManager->AddTableWidget();
+    bool assetsExist = m_tabManager->AddTableWidget();
+
+    if (ui->edSearch->text() != "" && !assetsExist) {
+        MineqMessageWidget* msgWidget = new MineqMessageWidget();
+        msgWidget->InformationMessage("No assets match the search criteria - remove or update criteria.");
+        m_tabManager->AddOneCentralWidget(msgWidget, "Search results", false);
+    }
+}
+
+void MainWindow::on_tabWidget_tabBarClicked(int index)
+{
+    m_tabManager->ChangeTabIndex(index);
+}
+
+void MainWindow::DisableOKButton() {
+    ui->OkButton->setStyleSheet("border: none; color: #FFFFFF; background-color: rgba(106, 158, 236, 50); margin-right: 40px;");
+    ui->OkButton->setEnabled(false);
 }

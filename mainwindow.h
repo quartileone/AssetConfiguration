@@ -39,7 +39,7 @@ private:
 
     void ReconfigurAsset(QString mountPath);
 
-
+    void DisableOKButton();
 private slots:
     void on_OkButton_clicked();
 
@@ -57,7 +57,9 @@ private slots:
 
     void slot_side_load_config_event(const QString &path);
 
-    void on_edSearch_textChanged(const QString &arg1);
+    void on_edSearch_textChanged(const QString &);
+
+    void on_tabWidget_tabBarClicked(int index);
 
 private:
     Ui::MainWindow *                      ui;

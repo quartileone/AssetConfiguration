@@ -27,9 +27,14 @@ void AssetTableWidget::slot_on_table_cell_clicked(int, int)
     }
 }
 
-void AssetTableWidget::Initialize(SiteConfigurationPtr configuration, QPushButton *pbOK)
+void AssetTableWidget::Initialize(SiteConfigurationPtr configuration,
+                                  std::vector<IConfigurationPtr>::const_iterator &first_avail,
+                                  const QString &AssetKeySearch, QPushButton *pbOK)
 {
     m_configuration->InsertConfiguration("", configuration);
+    auto &AssetVec = configuration->Assets();
+    auto it = first_avail;
+    size_t assetCounter;
     m_pbOK = pbOK;
     connect(this
             , SIGNAL(cellClicked(int, int))
@@ -37,23 +42,30 @@ void AssetTableWidget::Initialize(SiteConfigurationPtr configuration, QPushButto
             , SLOT(slot_on_table_cell_clicked(int,int)));
 
     this->setColumnCount(COLUMN_COUNT);
-    this->setRowCount((configuration->Assets().Size() + COLUMN_COUNT - 1) / COLUMN_COUNT);
+    for (assetCounter = 0; it < AssetVec.cend(); it++, assetCounter++) {
+        auto Asset = std::dynamic_pointer_cast<AssetConfiguration>(*it);
+        if (AssetKeySearch != "") {
+            if (!Asset->key().toLower().startsWith(AssetKeySearch, Qt::CaseSensitive))
+                break;
+        }
+    }
+    this->setRowCount((assetCounter + COLUMN_COUNT - 1) / COLUMN_COUNT);
 
     InitStyleSheet();
 
     int rowToPaste = -1;
     int colToPaste = 0;
-    for (int i = 0; i < configuration->Assets().Size(); i++) {
+    it = first_avail;
+    for (size_t i = 0; i < assetCounter; it++, i++) {
+        auto Asset = std::dynamic_pointer_cast<AssetConfiguration>(*it);
         rowToPaste += i % COLUMN_COUNT == 0 ? 1 : 0;
         colToPaste = i % COLUMN_COUNT == 0 ? 0 : colToPaste;
-
-        AssetTableWidgetItem* assetCell = new AssetTableWidgetItem(configuration->Assets().Item<AssetConfiguration>(i));
+        AssetTableWidgetItem* assetCell = new AssetTableWidgetItem(Asset);
         assetCell->setTextAlignment(Qt::AlignCenter);
         this->setItem(rowToPaste, colToPaste, assetCell);
 
         ++colToPaste;
     }
-
     // need to disable empty row selection
     for (int i = colToPaste; i < COLUMN_COUNT; ++i) {
         QTableWidgetItem* assetCell = new QTableWidgetItem();

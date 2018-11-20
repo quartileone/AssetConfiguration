@@ -13,17 +13,19 @@ public:
     MineqTabManager(QTabWidget* tabWidget, QLineEdit *filter, QPushButton *pbOK);
 
     void InitSitesConfig(TUPSites &&sitesList);
-    void AddOneCentralWidget(QWidget* widget, const QString &tabTitle);
-    void AddTableWidget();
+    void AddOneCentralWidget(QWidget* widget, const QString &tabTitle, bool hideFilter = true);
+    bool AddTableWidget();
     void SetTabStyle(int tabCount);
     void ClearTabs();
     void OnSearchTextChanged(const QString &strNewText);
+    void ChangeTabIndex(int index);
 private:
-    QTabWidget  * m_tabWidget;
-    QLineEdit   * m_filter;
-    QPushButton * m_pbOK;
-    TUPSites    m_sitesList;
+    QTabWidget           * m_tabWidget;
+    QLineEdit            * m_filter;
+    QPushButton          * m_pbOK;
+    TUPSites             m_sitesList;
     SiteConfigurationPtr m_AllSites;
+    int                  m_prevTabIndex;
 };
 
 #endif // MINEQTABMANAGER_H
