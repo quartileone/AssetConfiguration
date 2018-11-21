@@ -6,8 +6,9 @@ It lets the user enter details of the asset and the appropriate configuration an
 
 ## Dependencies
 
-Since newest version application doesn't depend on any external application file. In particular all sources are compiled inside. However depends on other at least
+Since newest version application doesn't depend on any external application resource. In particular all sources are compiled inside. However depends on other at least
 configuratuional input file which is supposed to be in usb stick, and it contents.
+Currently depends on version of QT installed on asset. For this moment version is 5.8
 
 ## Parameters
 
