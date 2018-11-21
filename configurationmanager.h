@@ -2,7 +2,7 @@
 #define CONFIGURATIONMANAGER_H
 
 #include <QProcess>
-
+#include <memory>
 #include "DataModel/iconfiguration.h"
 #include "Configurations/assetconfiguration.h"
 #include "Configurations/localassetconfiguration.h"
@@ -14,10 +14,6 @@ public:
     ConfigurationManager()
         : m_configuration(new LocalAssetConfiguration())
         , m_isAssetConfigured(false)
-    {
-    }
-
-    ~ConfigurationManager()
     {
     }
 
@@ -43,7 +39,7 @@ private:
     QString ReadJsonConfig(QString strJsonFile);
 
 private:
-   LocalAssetConfiguration* m_configuration;
+   std::unique_ptr<LocalAssetConfiguration> m_configuration;
    CurrentConfiguration m_currentConfiguration;
    bool m_isAssetConfigured;
 };

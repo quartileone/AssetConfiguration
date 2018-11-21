@@ -8,7 +8,7 @@
 
 #include <QDebug>
 #include <QProcess>
-
+#include <memory>
 #include "usbconfigmounter.h"
 
 #define MOUNT_TOOL     "sudo mount "
@@ -26,7 +26,7 @@ bool UsbConfigMounter::MountConfigUsbFlash(QString mountPath)
       m_usbMountedDir.mkdir(mountPath + QDir::separator() + m_usbFlashDir.dirName());
     }
 
-    QProcess* proc = new QProcess();
+    std::unique_ptr<QProcess> proc(new QProcess());
     QString strMount = MOUNT_TOOL;
     strMount += "-t auto ";
     strMount += m_usbFlashDir.absolutePath();
@@ -46,7 +46,7 @@ bool UsbConfigMounter::MountConfigUsbFlash(QString mountPath)
 
 void UsbConfigMounter::UnmountConfigUsbFlash(QString mountPath)
 {
-    QProcess* proc = new QProcess();
+    std::unique_ptr<QProcess> proc(new QProcess());
     QString strMount = UNMOUNT_TOOL;
     strMount += m_usbFlashDir.absolutePath();
 

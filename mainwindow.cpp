@@ -3,7 +3,6 @@
 #include <QTableWidget>
 
 #include "mainwindow.h"
-
 #include "Utilities/terminalcmdexecutor.h"
 #include "Utilities/usbconfigmounter.h"
 
@@ -38,6 +37,7 @@ MainWindow::~MainWindow()
 {
     m_usbWatcher->disconnect();
     m_vmshareWatcher->disconnect();
+    delete ui;
 }
 
 bool MainWindow::Initialize()
@@ -168,9 +168,9 @@ void MainWindow::on_OkButton_clicked()
 
     AssetConfigProcessWidget* configProcWidget = new AssetConfigProcessWidget(pocessConfig);
     connect(configProcWidget
-            , SIGNAL(configFinished(IConfiguration*, ConfigurationType))
+            , SIGNAL(configFinished(IConfigurationPtr, ConfigurationType))
             , this
-            , SLOT(slot_configuration_finished(IConfiguration*, ConfigurationType)));
+            , SLOT(slot_configuration_finished(IConfigurationPtr, ConfigurationType)));
 
     JsonConfigurationPtr assetConfiguration(new JsonConfiguration());
 
