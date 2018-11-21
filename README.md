@@ -6,21 +6,20 @@ It lets the user enter details of the asset and the appropriate configuration an
 
 ## Dependencies
 
-This utility depends upon a file system content which has the structure described here.
+Since newest version application doesn't depend on any external application file. In particular all sources are compiled inside. However depends on other at least
+configuratuional input file which is supposed to be in usb stick, and it contents.
 
 ## Parameters
 
-When this utility is run the following input parameters are expected
-
-???
+Program has no parameters.
 
 ## How to run this utility
 
-<todo>
+Normally it runs as start-up gnome application.
 
 ## Releases of this utility stored
 
-??? In the github repository
+In the dropbox. Devops should know where it is.
 
 ## Online documentation
 
@@ -30,3 +29,4 @@ When this utility is run the following input parameters are expected
 ## Why is this code public
 
 This code is a public repository because it uses the QT library which is only available for use for free under the [GNU LGPL license](http://doc.qt.io/qt-5/licensing.html).
+For now code is published under LGPL v3
