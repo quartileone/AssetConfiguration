@@ -103,7 +103,7 @@ void MainWindow::ShowManualConfiguration(QDir mountedConfigDir)
 
 void MainWindow::ShowDefaultView()
 {
-    DisableOKButton();
+    m_tabManager->DisableOKButton();
 
     ui->OkButton->setVisible(false);
     ui->cancelButton->setVisible(false);
@@ -174,8 +174,12 @@ void MainWindow::on_OkButton_clicked()
 
     JsonConfigurationPtr assetConfiguration(new JsonConfiguration());
 
-    assetConfiguration->InsertConfiguration("", assetTable->configuration());
-    assetConfiguration->InsertConfiguration("assetConfigs", tableItem->configuration());
+    AssetConfigurationPtr asset = tableItem->configuration();
+
+    SiteConfigurationPtr site = std::dynamic_pointer_cast<SiteConfiguration>(asset->getSite().lock());
+
+    assetConfiguration->InsertConfiguration("", site);
+    assetConfiguration->InsertConfiguration("assetConfigs", asset);
 
     m_tabManager->AddOneCentralWidget(configProcWidget, "Configuring");
 
@@ -289,7 +293,3 @@ void MainWindow::on_tabWidget_tabBarClicked(int index)
     m_tabManager->ChangeTabIndex(index);
 }
 
-void MainWindow::DisableOKButton() {
-    ui->OkButton->setStyleSheet("border: none; color: #FFFFFF; background-color: rgba(106, 158, 236, 50); margin-right: 40px;");
-    ui->OkButton->setEnabled(false);
-}

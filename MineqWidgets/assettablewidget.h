@@ -18,13 +18,10 @@ public:
     AssetTableWidget(const AssetTableWidget &) = delete;
     AssetTableWidget& operator = (const AssetTableWidget&) = delete;
 
+    void ClearSelected();
     void Initialize(SiteConfigurationPtr configuration,
                     std::vector<IConfigurationPtr>::const_iterator &first_avail,
                     const QString &AssetKeySearch, QPushButton *pbOK);
-
-    JsonConfigurationPtr configuration() {
-        return std::dynamic_pointer_cast<JsonConfiguration>(m_configuration);
-    }
 
 private:
     void InitStyleSheet();
@@ -33,10 +30,8 @@ private slots:
     void slot_on_table_cell_clicked(int, int);
 
 private:
-    std::shared_ptr<JsonConfiguration> m_configuration;
     QPushButton * m_pbOK;
 };
-
 
 class AssetTableWidgetItem: public QTableWidgetItem
 {
@@ -47,7 +42,7 @@ public:
         this->setText(configuration->key());
     }
 
-    IConfigurationPtr configuration() { return m_configuration; }
+    AssetConfigurationPtr configuration() { return m_configuration; }
 
 private:
     AssetConfigurationPtr m_configuration;

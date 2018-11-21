@@ -19,18 +19,27 @@ public:
     QString key() const { return m_key; }
     int id() const { return m_id; }
 
+    std::weak_ptr<JsonConfiguration> getSite() {
+        return m_site;
+    }
+    void setSite(std::shared_ptr<JsonConfiguration> conf) {
+        m_site = conf;
+    }
+
+
 // IConfiguration implementation
 private:
     void Serialize(ConfigSerializer& ser) override;
     void Deserialize(ConfigSerializer& desr) override;
 
-protected:
+private:
     int m_id;
     QString m_key;
     QString m_description;
     QString m_persistence_profile;
     QJsonObject m_vpn;
     QJsonObject m_lan;
+    std::weak_ptr<JsonConfiguration> m_site;
 };
 
 typedef std::shared_ptr<AssetConfiguration> AssetConfigurationPtr;

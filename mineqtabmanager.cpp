@@ -20,11 +20,12 @@ void MineqTabManager::InitSitesConfig(TUPSites &&sitesList) {
     m_sitesList->ForEach<SiteConfiguration>([&lAllAssets](const SiteConfigurationPtr &el) {
         auto old_size = lAllAssets.size();
         lAllAssets.reserve(old_size + el->Assets().size());
-        std::transform(el->Assets().cbegin(), el->Assets().cend(), std::back_inserter(lAllAssets),
-                       [](const IConfigurationPtr &el) {
-            return std::dynamic_pointer_cast<AssetConfiguration>(el);
-        });
-
+        for (auto & asset : el->Assets()) {
+            lAllAssets.push_back(asset);
+            // set of original site to find it later during configuration in case even asset was configured
+            // from fake 'all sites' page:
+            std::dynamic_pointer_cast<AssetConfiguration>(asset)->setSite(el);
+        }
         if (old_size > 0) {
             std::inplace_merge(lAllAssets.begin(), lAllAssets.begin() + old_size, lAllAssets.end(),
                                lAllAssets.GetComparator());
@@ -42,13 +43,16 @@ void MineqTabManager::AddOneCentralWidget(QWidget *widget, const QString &tabTit
     m_tabWidget->addTab(widget, tabTitle);
 }
 
+void MineqTabManager::DisableOKButton() {
+    m_pbOK->setStyleSheet("border: none; color: #FFFFFF; background-color: rgba(106, 158, 236, 50); margin-right: 40px;");
+    m_pbOK->setEnabled(false);
+}
+
 void MineqTabManager::ChangeTabIndex(int index) {
     if (m_prevTabIndex != index) {
-        QTableWidget* tableWidget = (QTableWidget*)m_tabWidget->currentWidget();
-        tableWidget->clearSelection();
-        tableWidget->setCurrentCell(-1, -1);
-        m_pbOK->setStyleSheet("border: none; color: #FFFFFF; background-color: rgba(106, 158, 236, 50); margin-right: 40px;");
-        m_pbOK->setEnabled(false);
+        AssetTableWidget* tableWidget = (AssetTableWidget*)m_tabWidget->currentWidget();
+        tableWidget->ClearSelected();
+        DisableOKButton();
     }
     m_prevTabIndex = index;
 }
@@ -56,11 +60,13 @@ void MineqTabManager::ChangeTabIndex(int index) {
 bool MineqTabManager::AddTableWidget()
 {
     QString strLowerCase = m_filter->text().toLower();
-    auto lambda_add = [this, &strLowerCase](const SiteConfigurationPtr &site) {
+    bool siteAdded;
+    auto lambda_add = [this, &strLowerCase](const SiteConfigurationPtr &site, bool AddToBack) {
         auto &AssetVec = site->Assets();
-        std::vector<IConfigurationPtr>::const_iterator it;
         if (AssetVec.size() == 0)
             return false;
+
+        std::vector<IConfigurationPtr>::const_iterator it;
         if (strLowerCase == "")
             it = AssetVec.cbegin();
         else
@@ -70,30 +76,33 @@ bool MineqTabManager::AddTableWidget()
                                         val, Qt::CaseSensitive) < 0;
             });
         if (it != AssetVec.cend()) {
-          const auto &AssetKey = std::dynamic_pointer_cast<AssetConfiguration>(*it)->key().toLower();
-          if (!AssetKey.startsWith(strLowerCase, Qt::CaseSensitive))
-              return false;
-          AssetTableWidget* assetTable = new AssetTableWidget();
-          assetTable->Initialize(site, it, strLowerCase, m_pbOK);
-          m_tabWidget->addTab(assetTable, site->description());
-          assetTable->clearSelection();
-          assetTable->setCurrentCell(-1, -1);
-          return true;
+            const auto &AssetKey = std::dynamic_pointer_cast<AssetConfiguration>(*it)->key().toLower();
+            if (!AssetKey.startsWith(strLowerCase, Qt::CaseSensitive))
+                return false;
+            AssetTableWidget* assetTable = new AssetTableWidget();
+            assetTable->Initialize(site, it, strLowerCase, m_pbOK);
+            if (AddToBack)
+                m_tabWidget->addTab(assetTable, site->description());
+            else
+                m_tabWidget->insertTab(0, assetTable, site->description());
+            return true;
         }
         return false;
     };
     ClearTabs();
-    m_pbOK->setStyleSheet("border: none; color: #FFFFFF; background-color: rgba(106, 158, 236, 50); margin-right: 40px;");
-    m_pbOK->setEnabled(false);
+    DisableOKButton();
 
     m_filter->setVisible(true);
     SetTabStyle(m_sitesList->size());
     // all sites in one list:
-    if (!lambda_add(m_AllSites))
+    siteAdded = false;
+    m_sitesList->ForEach<SiteConfiguration>([&siteAdded, lambda_add](const SiteConfigurationPtr &el) {
+        if (lambda_add(el, true))
+            siteAdded = true;
+    });
+    if (!siteAdded)
         return false;
-    for (size_t i = 0; i < m_sitesList->size(); ++i) {
-        lambda_add(m_sitesList->Item<SiteConfiguration>(i));
-    }
+    lambda_add(m_AllSites, false);
     m_prevTabIndex = 0;
     m_tabWidget->setCurrentIndex(0);
     return true;

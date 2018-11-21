@@ -8,7 +8,7 @@
 #define COLUMN_COUNT 3
 
 AssetTableWidget::AssetTableWidget(QWidget *parent)
-    : QTableWidget(parent), m_configuration(new JsonConfiguration())
+    : QTableWidget(parent)
 {
     QFont fnt;
     fnt.setPointSize(16);
@@ -30,7 +30,6 @@ void AssetTableWidget::Initialize(SiteConfigurationPtr configuration,
                                   std::vector<IConfigurationPtr>::const_iterator &first_avail,
                                   const QString &AssetKeySearch, QPushButton *pbOK)
 {
-    m_configuration->InsertConfiguration("", configuration);
     auto &AssetVec = configuration->Assets();
     auto it = first_avail;
     size_t assetCounter;
@@ -73,6 +72,12 @@ void AssetTableWidget::Initialize(SiteConfigurationPtr configuration,
 
         ++colToPaste;
     }
+    ClearSelected();
+}
+
+void AssetTableWidget::ClearSelected() {
+    clearSelection();
+    setCurrentCell(-1, -1);
 }
 
 void AssetTableWidget::InitStyleSheet()

@@ -38,8 +38,6 @@ private:
     void ShowDefaultView();
 
     void ReconfigurAsset(QString mountPath);
-
-    void DisableOKButton();
 private slots:
     void on_OkButton_clicked();
 

@@ -19,6 +19,7 @@ public:
     void ClearTabs();
     void OnSearchTextChanged(const QString &strNewText);
     void ChangeTabIndex(int index);
+    void DisableOKButton();
 private:
     QTabWidget           * m_tabWidget;
     QLineEdit            * m_filter;
