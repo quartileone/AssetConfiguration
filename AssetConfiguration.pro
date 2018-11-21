@@ -5,10 +5,9 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
-QT       += network
+QT     += core gui network
 
-CONFIG +=C++11
+CONFIG += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -16,39 +15,14 @@ TARGET = AssetConfiguration
 TEMPLATE = app
 
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
-    DataModel/configserializer.cpp \
-    Configurations/localassetconfiguration.cpp \
-    Configurations/assetconfiguration.cpp \
-    Configurations/jsonconfiguration.cpp \
-    MineqWidgets/assettablewidget.cpp \
-    Utilities/terminalcmdexecutor.cpp \
-    Utilities/usbconfigmounter.cpp \
-    MineqWidgets/assetconfigprocesswidget.cpp \
-    configurationmanager.cpp \
-    Configurations/deviceconfiguration.cpp \
-    MineqWidgets/mineqmessagewidget.cpp \
-    Configurations/currentconfiguration.cpp \
-    mineqtabmanager.cpp
+SOURCES += $$files(*.cpp, true)
 
-HEADERS  += mainwindow.h \
-    DataModel/configserializer.h \
-    DataModel/iconfiguration.h \
-    Configurations/localassetconfiguration.h \
-    Configurations/assetconfiguration.h \
-    Configurations/jsonconfiguration.h \
-    MineqWidgets/assettablewidget.h \
-    Utilities/terminalcmdexecutor.h \
-    Utilities/usbconfigmounter.h \
-    MineqWidgets/assetconfigprocesswidget.h \
-    configurationmanager.h \
-    Configurations/deviceconfiguration.h \
-    MineqWidgets/mineqmessagewidget.h \
-    Configurations/currentconfiguration.h \
-    mineqtabmanager.h \
-    qdevicewatcher.h
+#SOURCES += $$files(/home/ice/Qt5/5.11.2/Src/qtbase/src/*.cpp, true)
 
-FORMS    += mainwindow.ui
+HEADERS  += $$files(*.h, true)
 
-unix:!macx: LIBS += -L$$PWD/lib/ -l:libQDeviceWatcher.a
+FORMS     += mainwindow.ui
+
+RESOURCES += mainwindow.qrc
+
+unix:!macx: LIBS += -L$$PWD/lib/ -lQDeviceWatcher

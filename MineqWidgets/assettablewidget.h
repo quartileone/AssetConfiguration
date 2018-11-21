@@ -2,51 +2,50 @@
 #define ASSETTABLEWIDGET_H
 
 #include <QTableWidget>
+#include <memory>
 #include <QSharedPointer>
+#include <QPushButton>
 
 #include "Configurations/assetconfiguration.h"
 #include "Configurations/jsonconfiguration.h"
 
-class AssetTableWidget
-        : public QTableWidget
+class AssetTableWidget : public QTableWidget
 {
     Q_OBJECT
 
 public:
-    AssetTableWidget(QWidget *parent = 0);
-    ~AssetTableWidget();
+    AssetTableWidget(QWidget *parent = nullptr);
+    AssetTableWidget(const AssetTableWidget &) = delete;
+    AssetTableWidget& operator = (const AssetTableWidget&) = delete;
 
-    void Initialize(SiteConfiguration* configuration);
-
-    JsonConfiguration* configuration() { return dynamic_cast<JsonConfiguration *>(m_configuration); }
+    void ClearSelected();
+    void Initialize(SiteConfigurationPtr configuration,
+                    std::vector<IConfigurationPtr>::const_iterator &first_avail,
+                    const QString &AssetKeySearch, QPushButton *pbOK);
 
 private:
-    void InitStyleShit();
+    void InitStyleSheet();
+
+private slots:
+    void slot_on_table_cell_clicked(int, int);
 
 private:
-    IConfiguration* m_configuration;
+    QPushButton * m_pbOK;
 };
 
-
-class AssetTableWidgetItem
-        : public QTableWidgetItem
+class AssetTableWidgetItem: public QTableWidgetItem
 {
 public:
-    AssetTableWidgetItem(AssetConfiguration* configuration)
+    AssetTableWidgetItem(AssetConfigurationPtr configuration)
         : m_configuration(configuration)
     {
-        this->setText(configuration->description());
+        this->setText(configuration->key());
     }
 
-    ~AssetTableWidgetItem()
-    {
-        delete m_configuration;
-    }
-
-    AssetConfiguration* configuration() { return dynamic_cast<AssetConfiguration *>(m_configuration); }
+    AssetConfigurationPtr configuration() { return m_configuration; }
 
 private:
-    IConfiguration* m_configuration;
+    AssetConfigurationPtr m_configuration;
 };
 
 #endif // ASSETTABLEWIDGET_H

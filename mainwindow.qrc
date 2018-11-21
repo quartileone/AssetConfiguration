@@ -1,0 +1,11 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>images/search.svg</file>
+    <file>images/ic_error.png</file>
+    <file>images/ic_info.png</file>
+    <file>images/ic_key.png</file>
+    <file>images/ic_question.png</file>
+    <file>images/loader_mineq.gif</file>
+    <file>images/logo_mineQ_on_dark.jpg</file>
+</qresource>
+</RCC>

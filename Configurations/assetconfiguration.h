@@ -3,6 +3,7 @@
 
 
 #include "Configurations/jsonconfiguration.h"
+#include <functional>
 
 class AssetConfiguration
         : public JsonConfiguration
@@ -15,45 +16,53 @@ public:
     {
     }
 
-    QString description() const { return m_description; }
+    QString key() const { return m_key; }
     int id() const { return m_id; }
+
+    std::weak_ptr<JsonConfiguration> getSite() {
+        return m_site;
+    }
+    void setSite(std::shared_ptr<JsonConfiguration> conf) {
+        m_site = conf;
+    }
+
 
 // IConfiguration implementation
 private:
     void Serialize(ConfigSerializer& ser) override;
     void Deserialize(ConfigSerializer& desr) override;
 
-protected:
+private:
     int m_id;
     QString m_key;
     QString m_description;
     QString m_persistence_profile;
     QJsonObject m_vpn;
     QJsonObject m_lan;
+    std::weak_ptr<JsonConfiguration> m_site;
 };
 
+typedef std::shared_ptr<AssetConfiguration> AssetConfigurationPtr;
 
-class AssetConfigurationList
-        : public IConfigurationList
+class AssetConfigurationList : public IConfigurationList
 {
 public:
-    AssetConfigurationList()
-    {
-    }
+    using TComparator = std::function<bool(const std::shared_ptr<IConfiguration> &, const std::shared_ptr<IConfiguration> &)>;
+    AssetConfigurationList() {};
 
-    AssetConfiguration* Item(int index) override
-    {
-        return static_cast<AssetConfiguration *>(m_list[index].data());
-    }
+    void SortAssets();
 
+    static TComparator GetComparator() {
+        return m_comparator;
+    }
 private:
     virtual void Serialize(ConfigSerializer& ser) override;
-    virtual void Deserialize(ConfigSerializer& desr) override;
+    virtual void Deserialize(ConfigSerializer&) override;
+    static TComparator m_comparator;
 };
 
 
-class SiteConfiguration
-        :public JsonConfiguration
+class SiteConfiguration: public JsonConfiguration
 {
 public:
     SiteConfiguration()
@@ -71,6 +80,7 @@ public:
     AssetConfigurationList& Assets() { return m_assets; }
 
     QString description() const { return m_description; }
+    void description(const QString &p_description) { m_description = p_description; }
     QString timeZone() const { return m_timeZone; }
     QJsonObject cluster() const { return m_cluster; }
     QJsonObject deviceHub() const { return m_deviceHub; }
@@ -94,6 +104,8 @@ protected:
     QString m_bandwidth_constraint; // bandwidth constraint for primary tun0 interface on OpenVPN container
 };
 
+typedef std::shared_ptr<SiteConfiguration> SiteConfigurationPtr;
+
 
 class SiteConfigurationList
         : public IConfigurationList
@@ -103,17 +115,13 @@ public:
     {
     }
 
-    SiteConfiguration* Item(int index) override
-    {
-        return static_cast<SiteConfiguration *>(m_list[index].data());
-    }
-
 private:
+    void SortSites();
     virtual void Serialize(ConfigSerializer& ser) override;
     virtual void Deserialize(ConfigSerializer& desr) override;
 
 };
 
-
+typedef std::unique_ptr<SiteConfigurationList> TUPSites;
 
 #endif // ASSETCONFIGURATION_H

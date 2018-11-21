@@ -2,7 +2,7 @@
 #define CONFIGURATIONMANAGER_H
 
 #include <QProcess>
-
+#include <memory>
 #include "DataModel/iconfiguration.h"
 #include "Configurations/assetconfiguration.h"
 #include "Configurations/localassetconfiguration.h"
@@ -17,15 +17,11 @@ public:
     {
     }
 
-    ~ConfigurationManager()
-    {
-    }
-
     bool Initialize();
 
-    SiteConfigurationList* GetAvailableConfiguration(QString configFilePath);
+    TUPSites GetAvailableConfiguration(QString configFilePath);
 
-    void UserDone(IConfiguration* configuration);
+    void UserDone(IConfigurationPtr configuration);
 
     bool IsAssetConfigured() const { return m_isAssetConfigured; }
 
@@ -43,7 +39,7 @@ private:
     QString ReadJsonConfig(QString strJsonFile);
 
 private:
-   LocalAssetConfiguration* m_configuration;
+   std::unique_ptr<LocalAssetConfiguration> m_configuration;
    CurrentConfiguration m_currentConfiguration;
    bool m_isAssetConfigured;
 };

@@ -20,7 +20,7 @@ public:
 
     void InsertObject(const QJsonObject& obj);
 
-    void InsertConfiguration(const QString& key, IConfiguration* value);
+    void InsertConfiguration(const QString& key, IConfigurationPtr value);
 
     virtual void TakeValue(const QString& key, QString& value);
     virtual void TakeValue(const QString& key, int& value);
@@ -34,5 +34,7 @@ public:
 protected:
     QMap<QString, QJsonValue> m_configValueMap;
 };
+
+typedef std::shared_ptr<JsonConfiguration> JsonConfigurationPtr;
 
 #endif // JSONCONFIGURATION_H

@@ -5,7 +5,7 @@
 #include <QDir>
 #include <QString>
 #include <QFileSystemWatcher>
-
+#include "ui_mainwindow.h"
 #include <qdevicewatcher.h>
 
 #include "configurationmanager.h"
@@ -25,7 +25,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
     bool Initialize();
@@ -33,13 +33,11 @@ public:
     void Start();
 
 private:
-    void ShowManualConfiguration(QDir moundetConfigDir);
+    void ShowManualConfiguration(QDir mountedConfigDir);
 
     void ShowDefaultView();
 
     void ReconfigurAsset(QString mountPath);
-
-
 private slots:
     void on_OkButton_clicked();
 
@@ -47,25 +45,28 @@ private slots:
 
     void on_cancelButton_clicked();
 
-    void slot_on_table_cell_clicked(int row, int col);
+    void slot_usb_added(const QString& dev);
 
-    void slot_device_added(const QString& dev);
+    void slot_usb_removed(const QString& dev);
 
-    void slot_device_removed(const QString& dev);
-
-    void slot_configuration_finished(IConfiguration* configuration, ConfigurationType configType);
+    void slot_configuration_finished(IConfigurationPtr configuration, ConfigurationType configType);
 
     void slot_on_mineq_msg_button_clicked(QString val, MineqButton but);
 
     void slot_side_load_config_event(const QString &path);
+
+    void on_edSearch_textChanged(const QString &);
+
+    void on_tabWidget_tabBarClicked(int index);
+
 private:
-    Ui::MainWindow          *ui;
-    QDeviceWatcher          *m_usbWatcher;
-    QFileSystemWatcher      *m_vmshareWatcher;
-    ConfigurationManager    *m_configManager;
-    MineqTabManager         *m_tabManager;
-    bool m_rebootOnUsbDetach;
-    QString m_mountedPath;
+    Ui::MainWindow *                      ui;
+    std::unique_ptr<QDeviceWatcher>       m_usbWatcher;
+    std::unique_ptr<QFileSystemWatcher>   m_vmshareWatcher;
+    std::unique_ptr<ConfigurationManager> m_configManager;
+    std::unique_ptr<MineqTabManager>      m_tabManager;
+    bool                                  m_rebootOnUsbDetach;
+    QString                               m_mountedPath;
 };
 
 #endif // MAINWINDOW_H

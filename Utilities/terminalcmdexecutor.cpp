@@ -7,15 +7,15 @@
  */
 
 #include <QProcess>
-
 #include "terminalcmdexecutor.h"
+#include <memory>
 
 static const QString TERMINAL_CMD_TOOL      = "xdotool ";
 
 
 void TerminalCmdExecutor::LockScreen()
 {
-    QProcess* proc = new QProcess();
+    std::unique_ptr<QProcess> proc(new QProcess());
     proc->start(TERMINAL_CMD_TOOL + "key super+l" );
     proc->waitForFinished();
     proc->close();
@@ -23,7 +23,7 @@ void TerminalCmdExecutor::LockScreen()
 
 void TerminalCmdExecutor::UnlockScreen(QString pass)
 {
-    QProcess* proc = new QProcess();
+    std::unique_ptr<QProcess> proc(new QProcess());
     proc->start(TERMINAL_CMD_TOOL + "type " + pass);
     proc->waitForFinished();
 
@@ -35,7 +35,7 @@ void TerminalCmdExecutor::UnlockScreen(QString pass)
 
 void TerminalCmdExecutor::Reboot()
 {
-    QProcess* proc = new QProcess();
+    std::unique_ptr<QProcess> proc(new QProcess());
     proc->startDetached("sudo shutdown -r now");
 
     proc->close();

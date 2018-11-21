@@ -26,7 +26,7 @@ class MineqMessageWidget
 {
     Q_OBJECT
 public:
-    explicit MineqMessageWidget(QString workingDir, QWidget *parent = 0);
+    explicit MineqMessageWidget(QWidget *parent = nullptr);
     ~MineqMessageWidget();
 
     void CriticalMessage(QString msg = QString::null);

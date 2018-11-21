@@ -24,18 +24,17 @@ class AssetConfigProcessWidget
 {
     Q_OBJECT
 public:
-    explicit AssetConfigProcessWidget(JsonConfiguration* configuration, QWidget *parent = 0);
+    explicit AssetConfigProcessWidget(std::unique_ptr<JsonConfiguration> &configuration, QWidget *parent = nullptr);
     ~AssetConfigProcessWidget();
 
-    void StartConfiguration(QString & usbMountedPath, IConfiguration* assetConfiguration = NULL);
+    void StartConfiguration(QString & usbMountedPath, JsonConfigurationPtr &assetConfiguration);
 
 private:
-    void ApplyConfiguration(QString & usbMountedPath, IConfiguration* assetConfiguration);
-
+    void ApplyConfiguration(QString & usbMountedPath, JsonConfigurationPtr &assetConfiguration);
     void DownloadConfiguration();
 
 signals:
-    void configFinished(IConfiguration* configuration, ConfigurationType configType);
+    void configFinished(IConfigurationPtr configuration, ConfigurationType configType);
 
 private slots:
     void slot_config_downloaded(QNetworkReply* reply);
@@ -45,8 +44,8 @@ private slots:
 private:
     QProcess* m_configProcess;
     QMovie* m_progress;
-    QSharedPointer<IConfiguration> m_assetConfiguration;
-    JsonConfiguration* m_configuration;
+    JsonConfigurationPtr m_assetConfiguration;
+    std::unique_ptr<JsonConfiguration> m_configuration;
     QLabel* m_logsLabel;
     ConfigurationType m_configurationType;
 };

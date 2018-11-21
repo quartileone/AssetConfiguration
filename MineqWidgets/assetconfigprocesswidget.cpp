@@ -11,11 +11,11 @@
 
 #define DEVICE_ROOT "/mineq/device/"
 
-AssetConfigProcessWidget::AssetConfigProcessWidget(JsonConfiguration* configuration, QWidget *parent)
+AssetConfigProcessWidget::AssetConfigProcessWidget(std::unique_ptr<JsonConfiguration> &configuration, QWidget *parent)
     : QWidget(parent)
     , m_configProcess(new QProcess())
     , m_progress(new QMovie())
-    , m_configuration(configuration)
+    , m_configuration(std::move(configuration))
     , m_logsLabel(new QLabel())
 {
     QString strLabelStyle ("QLabel"
@@ -25,18 +25,16 @@ AssetConfigProcessWidget::AssetConfigProcessWidget(JsonConfiguration* configurat
                                 "font: 18pt;"
                            "}");
 
-    QString workingPath;
-    m_configuration->TakeValue("workingPath", workingPath);
-    m_progress->setFileName(workingPath + "/images/loader_mineq.gif");
+    m_progress->setFileName(":/images/loader_mineq.gif");
 
     QVBoxLayout* vertLayout = new QVBoxLayout();
     vertLayout->setAlignment(Qt::AlignCenter);
 
-    QLabel* progresLabel = new QLabel();
-    progresLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    progresLabel->setStyleSheet(strLabelStyle);
-    progresLabel->setMovie(m_progress);
-    vertLayout->addWidget(progresLabel);
+    QLabel* progressLabel = new QLabel();
+    progressLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    progressLabel->setStyleSheet(strLabelStyle);
+    progressLabel->setMovie(m_progress);
+    vertLayout->addWidget(progressLabel);
 
     m_logsLabel->setStyleSheet(strLabelStyle);
     m_logsLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
@@ -58,8 +56,6 @@ AssetConfigProcessWidget::AssetConfigProcessWidget(JsonConfiguration* configurat
 
 AssetConfigProcessWidget::~AssetConfigProcessWidget()
 {
-    delete m_configuration;
-
     m_configProcess->disconnect();
     delete m_configProcess;
 
@@ -75,7 +71,7 @@ AssetConfigProcessWidget::~AssetConfigProcessWidget()
     delete this->layout();
 }
 
-void AssetConfigProcessWidget::StartConfiguration(QString & usbMountedPath, IConfiguration *assetConfiguration)
+void AssetConfigProcessWidget::StartConfiguration(QString & usbMountedPath, JsonConfigurationPtr &assetConfiguration)
 {
     m_progress->start();
     if (assetConfiguration) {
@@ -87,9 +83,9 @@ void AssetConfigProcessWidget::StartConfiguration(QString & usbMountedPath, ICon
     }
 }
 
-void AssetConfigProcessWidget::ApplyConfiguration(QString & usbMountedPath, IConfiguration *assetConfiguration)
+void AssetConfigProcessWidget::ApplyConfiguration(QString & usbMountedPath, JsonConfigurationPtr &assetConfiguration)
 {
-    m_assetConfiguration = QSharedPointer<IConfiguration>(assetConfiguration);
+    m_assetConfiguration = assetConfiguration;
 
     QString shFile;
     m_configuration->TakeValue("shFile", shFile);
@@ -121,14 +117,15 @@ void AssetConfigProcessWidget::slot_config_downloaded(QNetworkReply *reply)
         SiteConfigurationList siteConfigList;
         ConfigSerializer::DeserializeS(siteConfigList, strReplyContent);
 
-        JsonConfiguration assetConfig;
-        assetConfig.InsertConfiguration("", siteConfigList.Item(0));
-        assetConfig.InsertConfiguration("", siteConfigList.Item(0)->Assets().Item(0));
+        JsonConfigurationPtr assetConfig(new JsonConfiguration());
+        assetConfig->InsertConfiguration("", siteConfigList.Item<IConfiguration>(0));
+        // why on the earth on 1st asset only???
+        assetConfig->InsertConfiguration("", siteConfigList.Item<SiteConfiguration>(0)->Assets().Item<IConfiguration>(0));
 
         QString str;
-        ApplyConfiguration(str, &assetConfig);
+        ApplyConfiguration(str, assetConfig);
     } else {
-        emit configFinished(NULL, m_configurationType);
+        emit configFinished(nullptr, m_configurationType);
     }
 }
 
@@ -140,10 +137,10 @@ void AssetConfigProcessWidget::slot_read_config_stdout()
 void AssetConfigProcessWidget::slot_config_finished(int /*exitCode*/, QProcess::ExitStatus exitStatus)
 {
     if (exitStatus == QProcess::CrashExit) {
-        emit configFinished(NULL, m_configurationType);
+        emit configFinished(nullptr, m_configurationType);
     }
 
     m_configProcess->close();
 
-    emit configFinished(m_assetConfiguration.data(), m_configurationType);
+    emit configFinished(m_assetConfiguration, m_configurationType);
 }

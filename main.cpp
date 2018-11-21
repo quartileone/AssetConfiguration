@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
     MainWindow w;
 
     w.showFullScreen();
-    if (w.Initialize() == false) {
+    if (!w.Initialize()) {
         return 0;
     }
 

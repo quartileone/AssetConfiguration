@@ -8,7 +8,7 @@ void JsonConfiguration::InsertObject(const QJsonObject &obj)
     }
 }
 
-void JsonConfiguration::InsertConfiguration(const QString &key, IConfiguration* value)
+void JsonConfiguration::InsertConfiguration(const QString &key, IConfigurationPtr value)
 {
     ConfigSerializer ser;
     value->Serialize(ser);

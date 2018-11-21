@@ -2,8 +2,6 @@
 #include <QString>
 #include <QHeaderView>
 #include <QTabWidget>
-#include <QPushButton>
-
 #include "assettablewidget.h"
 
 
@@ -18,54 +16,71 @@ AssetTableWidget::AssetTableWidget(QWidget *parent)
     this->setFont(fnt);
 }
 
-AssetTableWidget::~AssetTableWidget()
+void AssetTableWidget::slot_on_table_cell_clicked(int, int)
 {
-    delete m_configuration;
+    QTableWidgetItem* tableItem = item(currentRow(), currentColumn());
+
+    if (tableItem) {
+        m_pbOK->setStyleSheet("border: none; color: #FFFFFF; background-color: rgb(106, 158, 236); margin-right: 40px");
+        m_pbOK->setEnabled(true);
+    }
 }
 
-
-void AssetTableWidget::Initialize(SiteConfiguration* configuration)
+void AssetTableWidget::Initialize(SiteConfigurationPtr configuration,
+                                  std::vector<IConfigurationPtr>::const_iterator &first_avail,
+                                  const QString &AssetKeySearch, QPushButton *pbOK)
 {
-     /*
-      * connect(this
+    auto &AssetVec = configuration->Assets();
+    auto it = first_avail;
+    size_t assetCounter;
+    m_pbOK = pbOK;
+    connect(this
             , SIGNAL(cellClicked(int, int))
             , this
-            , SLOT(on_table_cell_clicked(int,int)));
-    */
-    JsonConfiguration* assetConfig = new JsonConfiguration();
-    assetConfig->InsertConfiguration("", configuration);
-
-    m_configuration = assetConfig;
+            , SLOT(slot_on_table_cell_clicked(int,int)));
 
     this->setColumnCount(COLUMN_COUNT);
-    this->setRowCount((configuration->Assets().Size() + COLUMN_COUNT - 1) / COLUMN_COUNT);
-
-    InitStyleShit();
-
-    int rowToPast = -1;
-    int colmToPast = 0;
-    for (int i = 0; i < configuration->Assets().Size(); i++) {
-        rowToPast += i % COLUMN_COUNT == 0 ? 1 : 0;
-        colmToPast = i % COLUMN_COUNT == 0 ? 0 : colmToPast;
-
-        AssetTableWidgetItem* assetCell = new AssetTableWidgetItem(configuration->Assets().Item(i));
-        assetCell->setTextAlignment(Qt::AlignCenter);
-        this->setItem(rowToPast, colmToPast, assetCell);
-
-        ++colmToPast;
+    for (assetCounter = 0; it < AssetVec.cend(); it++, assetCounter++) {
+        auto Asset = std::dynamic_pointer_cast<AssetConfiguration>(*it);
+        if (AssetKeySearch != "") {
+            if (!Asset->key().toLower().startsWith(AssetKeySearch, Qt::CaseSensitive))
+                break;
+        }
     }
+    this->setRowCount((assetCounter + COLUMN_COUNT - 1) / COLUMN_COUNT);
 
+    InitStyleSheet();
+
+    int rowToPaste = -1;
+    int colToPaste = 0;
+    it = first_avail;
+    for (size_t i = 0; i < assetCounter; it++, i++) {
+        auto Asset = std::dynamic_pointer_cast<AssetConfiguration>(*it);
+        rowToPaste += i % COLUMN_COUNT == 0 ? 1 : 0;
+        colToPaste = i % COLUMN_COUNT == 0 ? 0 : colToPaste;
+        AssetTableWidgetItem* assetCell = new AssetTableWidgetItem(Asset);
+        assetCell->setTextAlignment(Qt::AlignCenter);
+        this->setItem(rowToPaste, colToPaste, assetCell);
+
+        ++colToPaste;
+    }
     // need to disable empty row selection
-    for (int i = colmToPast; i < COLUMN_COUNT; ++i) {
+    for (int i = colToPaste; i < COLUMN_COUNT; ++i) {
         QTableWidgetItem* assetCell = new QTableWidgetItem();
         assetCell->setFlags(Qt::NoItemFlags);
-        this->setItem(rowToPast, colmToPast, assetCell);
+        this->setItem(rowToPaste, colToPaste, assetCell);
 
-        ++colmToPast;
+        ++colToPaste;
     }
+    ClearSelected();
 }
 
-void AssetTableWidget::InitStyleShit()
+void AssetTableWidget::ClearSelected() {
+    clearSelection();
+    setCurrentCell(-1, -1);
+}
+
+void AssetTableWidget::InitStyleSheet()
 {
     this->setShowGrid(false);
     QString strTableStyle ("QTableView::item"
